@@ -1,0 +1,224 @@
+/* General Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F7FAFC;
+    color: #111827;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #1F2937;
+    color: #F3F4F6;
+}
+
+/* Animations */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.back-to-top.show {
+    transform: scale(1);
+}
+
+.project-img {
+    transition: transform 0.4s ease;
+}
+
+.project-card:hover .project-img {
+    transform: scale(1.1);
+}
+
+/* Navbar Styles */
+.navbar {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.navbar.scrolled {
+    background-color: rgba(31, 41, 55, 0.9);
+}
+
+body.dark-mode .navbar.scrolled {
+    background-color: rgba(75, 85, 99, 0.9);
+}
+
+/* Hero Section */
+.hero-bg {
+    background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+    background-size: cover;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.modal-content {
+    margin: 10% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode .modal-content {
+    background-color: #374151;
+    color: #F3F4F6;
+}
+
+/* Progress Bar Animation */
+.progress {
+    width: 0;
+    animation: fillBar 1.5s ease forwards;
+}
+
+@keyframes fillBar {
+    to { width: inherit; }
+}
+
+/* Dark Mode Adjustments */
+/* Background Colors */
+body.dark-mode .bg-white,
+body.dark-mode .bg-gray-50 {
+    background-color: #374151;
+    color: #F3F4F6;
+}
+
+body.dark-mode .bg-gray-100 {
+    background-color: #2D3748;
+}
+
+/* Text Colors */
+body.dark-mode .text-gray-900 {
+    color: #F3F4F6;
+}
+
+body.dark-mode .text-gray-700,
+body.dark-mode .text-gray-600 {
+    color: #D1D5DB;
+}
+
+/* Inputs and Buttons */
+body.dark-mode input,
+body.dark-mode textarea {
+    background-color: #4B5563;
+    color: #F3F4F6;
+    border-color: #6B7280;
+}
+
+body.dark-mode .bg-blue-500 {
+    background-color: #3B82F6;
+}
+
+body.dark-mode .bg-blue-500:hover {
+    background-color: #2563EB;
+}
+
+/* Links */
+body.dark-mode .text-blue-500 {
+    color: #60A5FA;
+}
+
+body.dark-mode .text-blue-500:hover {
+    color: #3B82F6;
+}
+
+/* Borders */
+body.dark-mode .border-gray-300 {
+    border-color: #4B5563;
+}
+
+/* Section-Specific Adjustments */
+/* About Section */
+body.dark-mode #about {
+    background-color: #374151;
+}
+
+body.dark-mode #about .text-gray-900 {
+    color: #F3F4F6;
+}
+
+body.dark-mode #about .text-gray-700 {
+    color: #D1D5DB;
+}
+
+/* Skills Section */
+body.dark-mode #skills .bg-white {
+    background-color: #4B5563;
+    color: #F3F4F6;
+}
+
+body.dark-mode #skills .progress {
+    background-color: #3B82F6;
+}
+
+body.dark-mode #skills .project-card:hover {
+    background-color: #525C6B;
+}
+
+/* Projects Section */
+body.dark-mode #projects .project-card,
+body.dark-mode #projects .bg-gray-50 {
+    background-color: #2D3748;
+    color: #F3F4F6;
+}
+
+/* Blog Section */
+body.dark-mode #blog {
+    background-color: #2D3748;
+}
+
+/* Contact Section */
+body.dark-mode #contact {
+    background-color: #374151;
+}
+
+body.dark-mode #contact input,
+body.dark-mode #contact textarea {
+    background-color: #4B5563;
+    color: #F3F4F6;
+    border-color: #6B7280;
+}
+
+/* Footer */
+body.dark-mode footer {
+    background-color: #1F2937;
+    color: #F3F4F6;
+}
+
+body.dark-mode footer a {
+    color: #60A5FA;
+}
+
+body.dark-mode footer a:hover {
+    color: #3B82F6;
+}

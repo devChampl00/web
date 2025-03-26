@@ -1,0 +1,51 @@
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.tag-link:hover {
+  background-color: rgba(var(--bs-secondary-bg-rgb), var(--bs-bg-opacity)) !important;
+  border-radius: 50px;
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+}
+
+.tags .active {
+  background-color: rgba(var(--bs-secondary-bg-rgb), var(--bs-bg-opacity)) !important;
+  border-radius: 50px;
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+}
+
+.widget-link:hover {
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+}
+
+.post:hover {
+  box-shadow: 0 0.5rem 1rem rgba(var(--bs-body-color-rgb), 0.15) !important;
+}
+
+img.avatar {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.share {
+  margin-top: 2rem;
+}
+
+.share-link:hover {
+  background-color: rgba(var(--bs-secondary-bg-rgb), var(--bs-bg-opacity)) !important;
+  border-radius: 50px;
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+  padding: 5px;
+}
+
+.hero-image {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  object-position: 50% 40%;
+}
