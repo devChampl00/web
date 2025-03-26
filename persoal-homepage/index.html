@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Explorer</title>
+    <title>File Explorer v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -14,18 +14,32 @@
     </div>
 
     <script>
-        const repoOwner = "devChampl00"; // Ganti dengan username GitHub kamu
-        const repoName = "web"; // Ganti dengan nama repo GitHub Pages kamu
-        const branch = "main"; // Ganti jika branch utama bukan 'main'
+        const repoOwner = "devChampl00";
+        const repoName = "web";
+        const branch = "main";
 
         // Dapatkan path dari lokasi saat ini
-        let currentPath = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
-        let apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${currentPath}?ref=${branch}`;
+        let currentPath = window.location.pathname
+            .replace(/^\//, '')
+            .replace(/\/$/, '')
+            .replace(repoName + '/', ''); // Tambahan untuk menghilangkan nama repo jika ada
+
+        let apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${currentPath || ''}?ref=${branch}`;
+
+        console.log("Current path:", currentPath);
+        console.log("API URL:", apiUrl);
 
         async function loadFiles() {
             try {
+                console.log("Fetching data from:", apiUrl);
                 const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const files = await response.json();
+                console.log("API response:", files);
 
                 const fileList = document.getElementById("fileList");
                 fileList.innerHTML = "";
@@ -37,11 +51,20 @@
 
                     let a = document.createElement("a");
                     a.textContent = "🔙 Kembali";
-                    a.href = "../";
+                    // Hitung path parent yang benar
+                    const parentPath = currentPath.split('/').slice(0, -1).join('/');
+                    a.href = parentPath ? `/${repoName}/${parentPath}` : `/${repoName}/`;
                     a.className = "text-red-600 font-medium hover:underline flex items-center";
 
                     li.appendChild(a);
                     fileList.appendChild(li);
+                }
+
+                // Pastikan files adalah array
+                if (!Array.isArray(files)) {
+                    console.error("Response is not an array:", files);
+                    fileList.innerHTML = "<li class='text-red-500'>Tidak ada file atau folder ditemukan</li>";
+                    return;
                 }
 
                 // Tampilkan daftar file & folder
@@ -51,7 +74,10 @@
 
                     let a = document.createElement("a");
                     a.textContent = file.name;
-                    a.href = file.type === "dir" ? `${file.name}/` : file.download_url;
+                    // Perbaiki href untuk navigasi yang benar
+                    a.href = file.type === "dir"
+                        ? `/${repoName}/${currentPath ? currentPath + '/' : ''}${file.name}/`
+                        : file.download_url;
                     a.target = "_self";
                     a.className = "text-blue-600 font-medium hover:underline flex items-center";
 
@@ -65,6 +91,13 @@
                 });
             } catch (error) {
                 console.error("Gagal mengambil data:", error);
+                document.getElementById("fileList").innerHTML = `
+                    <li class="text-red-500 p-3">
+                        Error: ${error.message}<br>
+                        Pastikan path "${currentPath}" ada di repo.<br>
+                        <a href="/${repoName}/" class="text-blue-600 underline">Kembali ke root</a>
+                    </li>
+                `;
             }
         }
 
