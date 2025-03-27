@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
     <meta name="keywords" content="personal branding, portfolio, premium, modern">
     <meta name="author" content="Nama Anda">
     <title>Nama Anda - Personal Branding</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -23,12 +26,40 @@
         };
     </script>
     <style>
-        .animate-fade-in { animation: fadeIn 1s ease-in-out; }
-        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .typed-cursor { animation: blink 0.7s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typed-cursor {
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
+
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-500">
     <!-- Preloader -->
     <div id="preloader" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
@@ -39,18 +70,22 @@
     <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-indigo-600 z-50 transition-all duration-300"></div>
 
     <!-- Navigasi -->
-    <nav class="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg py-4 px-6 flex justify-between items-center">
+    <nav
+        class="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg py-4 px-6 flex justify-between items-center">
         <div class="text-2xl font-playfair font-bold">Nama Anda</div>
         <ul class="hidden md:flex space-x-8">
             <li><a href="#home" class="hover:text-indigo-500 transition-colors duration-300">Home</a></li>
             <li><a href="#about" class="hover:text-indigo-500 transition-colors duration-300">About</a></li>
             <li><a href="#portfolio" class="hover:text-indigo-500 transition-colors duration-300">Portfolio</a></li>
-            <li><a href="#testimonials" class="hover:text-indigo-500 transition-colors duration-300">Testimonials</a></li>
+            <li><a href="#testimonials" class="hover:text-indigo-500 transition-colors duration-300">Testimonials</a>
+            </li>
             <li><a href="#blog" class="hover:text-indigo-500 transition-colors duration-300">Blog</a></li>
             <li><a href="#contact" class="hover:text-indigo-500 transition-colors duration-300">Contact</a></li>
         </ul>
         <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm0 14a6 6 0 110-12 6 6 0 010 12z"/></svg>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm0 14a6 6 0 110-12 6 6 0 010 12z" />
+            </svg>
         </button>
         <div class="md:hidden hamburger cursor-pointer text-2xl">☰</div>
     </nav>
@@ -68,12 +103,18 @@
     </div>
 
     <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-900 parallax">
+    <section id="home"
+        class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-900 parallax">
         <div class="text-center px-6">
-            <img src="https://via.placeholder.com/250" alt="Foto Profil" class="rounded-full w-40 h-40 mx-auto mb-6 border-4 border-white shadow-lg">
-            <h1 class="text-5xl md:text-7xl font-playfair font-bold mb-4"><span id="typed-text"></span><span class="typed-cursor">|</span></h1>
-            <p class="text-xl md:text-2xl font-poppins text-gray-600 dark:text-gray-300 mb-6">Desainer | Pengembang | Visioner</p>
-            <a href="#contact" class="inline-block bg-indigo-600 text-white py-3 px-8 rounded-full font-poppins text-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">Hubungi Saya</a>
+            <img src="https://via.placeholder.com/250" alt="Foto Profil"
+                class="rounded-full w-40 h-40 mx-auto mb-6 border-4 border-white shadow-lg">
+            <h1 class="text-5xl md:text-7xl font-playfair font-bold mb-4"><span id="typed-text"></span><span
+                    class="typed-cursor">|</span></h1>
+            <p class="text-xl md:text-2xl font-poppins text-gray-600 dark:text-gray-300 mb-6">Desainer | Pengembang |
+                Visioner</p>
+            <a href="#contact"
+                class="inline-block bg-indigo-600 text-white py-3 px-8 rounded-full font-poppins text-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">Hubungi
+                Saya</a>
         </div>
     </section>
 
@@ -81,7 +122,9 @@
     <section id="about" class="py-20 px-6">
         <h2 class="text-4xl font-playfair text-center mb-12">Tentang Saya</h2>
         <div class="max-w-3xl mx-auto text-center font-poppins text-gray-700 dark:text-gray-300">
-            <p class="text-lg leading-relaxed">Saya seorang profesional kreatif dengan pengalaman lebih dari 5 tahun di bidang desain dan teknologi. Fokus saya adalah menciptakan karya yang elegan, fungsional, dan berdampak.</p>
+            <p class="text-lg leading-relaxed">Saya seorang profesional kreatif dengan pengalaman lebih dari 5 tahun di
+                bidang desain dan teknologi. Fokus saya adalah menciptakan karya yang elegan, fungsional, dan berdampak.
+            </p>
         </div>
     </section>
 
@@ -89,22 +132,36 @@
     <section id="portfolio" class="py-20 px-6 bg-gray-100 dark:bg-gray-800">
         <h2 class="text-4xl font-playfair text-center mb-12">Portofolio</h2>
         <div class="flex justify-center space-x-4 mb-8">
-            <button class="filter-btn px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700" data-filter="all">Semua</button>
-            <button class="filter-btn px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-indigo-600 hover:text-white" data-filter="design">Desain</button>
-            <button class="filter-btn px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-indigo-600 hover:text-white" data-filter="dev">Pengembangan</button>
+            <button class="filter-btn px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700"
+                data-filter="all">Semua</button>
+            <button
+                class="filter-btn px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-indigo-600 hover:text-white"
+                data-filter="design">Desain</button>
+            <button
+                class="filter-btn px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-indigo-600 hover:text-white"
+                data-filter="dev">Pengembangan</button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto portfolio-grid">
-            <div class="portfolio-card bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300" data-category="design">
+            <div class="portfolio-card bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300"
+                data-category="design">
                 <img src="https://via.placeholder.com/400" alt="Proyek 1" class="w-full h-48 object-cover">
-                <div class="p-4"><p class="font-poppins text-lg">Proyek Desain 1</p></div>
+                <div class="p-4">
+                    <p class="font-poppins text-lg">Proyek Desain 1</p>
+                </div>
             </div>
-            <div class="portfolio-card bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300" data-category="dev">
+            <div class="portfolio-card bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300"
+                data-category="dev">
                 <img src="https://via.placeholder.com/400" alt="Proyek 2" class="w-full h-48 object-cover">
-                <div class="p-4"><p class="font-poppins text-lg">Proyek Pengembangan 1</p></div>
+                <div class="p-4">
+                    <p class="font-poppins text-lg">Proyek Pengembangan 1</p>
+                </div>
             </div>
-            <div class="portfolio-card bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300" data-category="design">
+            <div class="portfolio-card bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300"
+                data-category="design">
                 <img src="https://via.placeholder.com/400" alt="Proyek 3" class="w-full h-48 object-cover">
-                <div class="p-4"><p class="font-poppins text-lg">Proyek Desain 2</p></div>
+                <div class="p-4">
+                    <p class="font-poppins text-lg">Proyek Desain 2</p>
+                </div>
             </div>
         </div>
     </section>
@@ -113,12 +170,16 @@
     <section id="testimonials" class="py-20 px-6">
         <h2 class="text-4xl font-playfair text-center mb-12">Testimoni</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <p class="font-poppins text-gray-600 dark:text-gray-300">"Kerja sama yang luar biasa, hasilnya sangat memuaskan!"</p>
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <p class="font-poppins text-gray-600 dark:text-gray-300">"Kerja sama yang luar biasa, hasilnya sangat
+                    memuaskan!"</p>
                 <p class="mt-4 font-playfair text-lg">- Klien 1</p>
             </div>
-            <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <p class="font-poppins text-gray-600 dark:text-gray-300">"Kreativitas dan profesionalisme yang tiada duanya."</p>
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <p class="font-poppins text-gray-600 dark:text-gray-300">"Kreativitas dan profesionalisme yang tiada
+                    duanya."</p>
                 <p class="mt-4 font-playfair text-lg">- Klien 2</p>
             </div>
         </div>
@@ -128,11 +189,13 @@
     <section id="blog" class="py-20 px-6">
         <h2 class="text-4xl font-playfair text-center mb-12">Blog</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                 <h3 class="font-playfair text-2xl mb-2">Judul Artikel 1</h3>
                 <p class="font-poppins text-gray-600 dark:text-gray-300">Ringkasan artikel pertama Anda.</p>
             </div>
-            <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                 <h3 class="font-playfair text-2xl mb-2">Judul Artikel 2</h3>
                 <p class="font-poppins text-gray-600 dark:text-gray-300">Ringkasan artikel kedua Anda.</p>
             </div>
@@ -143,20 +206,32 @@
     <section id="contact" class="py-20 px-6 bg-gray-100 dark:bg-gray-800">
         <h2 class="text-4xl font-playfair text-center mb-12">Kontak</h2>
         <form class="max-w-lg mx-auto space-y-6">
-            <input type="text" placeholder="Nama" class="w-full p-4 bg-white/50 dark:bg-gray-700/50 backdrop-blur-md rounded-lg border-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300" required>
-            <input type="email" placeholder="Email" class="w-full p-4 bg-white/50 dark:bg-gray-700/50 backdrop-blur-md rounded-lg border-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300" required>
-            <textarea placeholder="Pesan" class="w-full p-4 bg-white/50 dark:bg-gray-700/50 backdrop-blur-md rounded-lg border-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300" rows="5" required></textarea>
-            <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-full font-poppins hover:bg-indigo-700 transition-all duration-300">Kirim Pesan</button>
+            <input type="text" placeholder="Nama"
+                class="w-full p-4 bg-white/50 dark:bg-gray-700/50 backdrop-blur-md rounded-lg border-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                required>
+            <input type="email" placeholder="Email"
+                class="w-full p-4 bg-white/50 dark:bg-gray-700/50 backdrop-blur-md rounded-lg border-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                required>
+            <textarea placeholder="Pesan"
+                class="w-full p-4 bg-white/50 dark:bg-gray-700/50 backdrop-blur-md rounded-lg border-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                rows="5" required></textarea>
+            <button type="submit"
+                class="w-full bg-indigo-600 text-white py-3 rounded-full font-poppins hover:bg-indigo-700 transition-all duration-300">Kirim
+                Pesan</button>
         </form>
         <div class="flex justify-center space-x-6 mt-8">
-            <a href="#" class="text-2xl hover:text-indigo-500 transition-all duration-300 transform hover:scale-110"><i class="fab fa-linkedin"></i></a>
-            <a href="#" class="text-2xl hover:text-indigo-500 transition-all duration-300 transform hover:scale-110"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="text-2xl hover:text-indigo-500 transition-all duration-300 transform hover:scale-110"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-2xl hover:text-indigo-500 transition-all duration-300 transform hover:scale-110"><i
+                    class="fab fa-linkedin"></i></a>
+            <a href="#" class="text-2xl hover:text-indigo-500 transition-all duration-300 transform hover:scale-110"><i
+                    class="fab fa-twitter"></i></a>
+            <a href="#" class="text-2xl hover:text-indigo-500 transition-all duration-300 transform hover:scale-110"><i
+                    class="fab fa-instagram"></i></a>
         </div>
     </section>
 
     <!-- Back-to-Top Button -->
-    <button id="backToTop" class="fixed bottom-8 right-8 bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 opacity-0">
+    <button id="backToTop"
+        class="fixed bottom-8 right-8 bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 opacity-0">
         <i class="fas fa-arrow-up"></i>
     </button>
 
@@ -167,4 +242,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

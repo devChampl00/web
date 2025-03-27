@@ -150,12 +150,12 @@ const initGame = () => {
         snakeBody.push([foodX, foodY]); // Add new segment
         score++;
 
-       // Perbarui high score
-       highScore = Math.max(score, parseInt(localStorage.getItem('high-score') || 0));
+        // Perbarui high score
+        highScore = Math.max(score, parseInt(localStorage.getItem('high-score') || 0));
 
-       localStorage.setItem('high-score', highScore);
-       scoreElement.innerText = `Score: ${score}`;
-       highScoreElement.innerText = `High Score: ${highScore}`;
+        localStorage.setItem('high-score', highScore);
+        scoreElement.innerText = `Score: ${score}`;
+        highScoreElement.innerText = `High Score: ${highScore}`;
     }
 
     // Update snake head position
@@ -192,7 +192,7 @@ const initGame = () => {
 
 // Difficulty and speed controls
 difficultySelect.addEventListener('change', (e) => {
-    switch(e.target.value) {
+    switch (e.target.value) {
         case 'easy':
             gameSpeed = 200;
             break;
