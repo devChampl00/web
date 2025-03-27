@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Explorer v2</title>
+    <title>File Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -79,7 +79,9 @@
                         // Perbaiki href untuk navigasi yang benar
                         a.href = file.type === "dir"
                             ? `/${repoName}/${currentPath ? currentPath + '/' : ''}${file.name}/`
-                            : file.download_url;
+                            : file.name.endsWith('.html') || file.name.endsWith('.htm')
+                                ? `/${repoName}/${currentPath ? currentPath + '/' : ''}${file.name}`
+                                : file.download_url;
                         a.target = "_self";
                         a.className = "text-blue-600 font-medium hover:underline flex items-center";
 
