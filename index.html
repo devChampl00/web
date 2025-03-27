@@ -34,7 +34,7 @@
                     let a = document.createElement("a");
                     a.textContent = file.name;
                     a.href = file.type === "dir" ? `./${file.name}/` : file.download_url;
-                    a.target = "_self";
+                    a.target = "_blank";
                     a.className = "text-blue-600 font-medium hover:underline flex items-center";
 
                     let icon = document.createElement("span");
