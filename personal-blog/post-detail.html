@@ -5,396 +5,175 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Blog Post</title>
+    <title>Post Detail</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body>
+  <body class="bg-light text-body-secondary" id="top">
     <!-- Responsive navbar-->
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm" aria-label="Offcanvas navbar large">
-            <div class="container-md col-lg-9">
-                <a class="navbar-brand brand-name" href="#!"> Gper Blog </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasNavbar2" aria-labelledby="offcanvasNavbar2Label" style="width: 270px">
-                    <div class="offcanvas-header">
-                        <h5 class="offcanvas-title" id="offcanvasNavbar2Label">
-                            <a class="navbar-brand brand-name" href="#!"> Gper Blog </a>
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div class="offcanvas-body">
-                        <ul class="navbar-nav justify-content-end flex-grow-1">
-                            <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
-                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Blog</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </nav> -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm" aria-label="Offcanvas navbar large">
+      <div class="container-md col-lg-9">
+        <a class="navbar-brand brand-name fw-semibold" href="#!"> G-blog </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-start text-bg-light" tabindex="-1" id="offcanvasNavbar2" aria-labelledby="offcanvasNavbar2Label" style="width: 270px">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbar2Label">
+              <a class="navbar-brand brand-name" href="#!"> G-blog </a>
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 small">
+              <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+              <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Blog</a></li>
+              <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
 
     <!-- Page content-->
-    <div class="container-md col-lg-9 px-4 mt-4">
-      <div class="row small">
-        <nav style="--bs-breadcrumb-divider: '/'" aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <!-- <a href="#" class="text-reset me-2">
-                            <i class="bi-arrow-left"></i>
-                        </a> -->
-            <li class="breadcrumb-item">
-              <a href="#" class="text-reset">Home</a>
-            </li>
-            <li class="breadcrumb-item">
-              <a href="#" class="text-reset">Blog</a>
-            </li>
-            <li class="breadcrumb-item"></li>
-            <!-- <li class="breadcrumb-item active" aria-current="page">
-                            <a href="#" class="text-reset">Ini Contoh Judul Postingan Blog!</a>
-                        </li> -->
-          </ol>
-        </nav>
-      </div>
+    <div class="container-md col-lg-9 my-4">
       <div class="row">
-        <div class="col-lg-8">
-          <div class="pe-0 pe-lg-3">
-            <!-- Post content-->
-            <article>
-              <!-- Post header-->
-              <header class="mb-4">
-                <!-- Post title-->
-                <h1 class="fw-semibold mb-1">Ini Contoh Judul Postingan Blog!</h1>
-                <!-- Post meta content-->
-                <div class="small text-muted fst-italic mb-2">Posted on January 1, on Tips & Tricks</div>
-                <!-- Post categories-->
-                <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
-                <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
-              </header>
-              <!-- Preview image figure-->
-              <figure class="mb-4"><img class="img-fluid rounded" src="https://dummyimage.com/900x500/ced4da/6c757d.jpg" alt="..." /></figure>
-              <!-- Post content-->
-              <section class="mb-5">
-                <p class="mb-4">Science is an enterprise that should be cherished as an activity of the free human mind. Because it transforms who we are, how we live, and it gives us an understanding of our place in the universe.</p>
-                <p class="mb-4">
-                  The universe is large and old, and the ingredients for life as we know it are everywhere, so there's no reason to think that Earth would be unique in that regard. Whether of not the life became intelligent is a different
-                  question, and we'll see if we find that.
-                </p>
-                <p class="mb-4">
-                  If you get asteroids about a kilometer in size, those are large enough and carry enough energy into our system to disrupt transportation, communication, the food chains, and that can be a really bad day on Earth.
-                </p>
-                <p class="mb-4">
-                  If you get asteroids about a kilometer in size, those are large enough and carry enough energy into our system to disrupt transportation, communication, the food chains, and that can be a really bad day on Earth.
-                </p>
-                <p class="mb-4">
-                  If you get asteroids about a kilometer in size, those are large enough and carry enough energy into our system to disrupt transportation, communication, the food chains, and that can be a really bad day on Earth.
-                </p>
-                <h2 class="fw-bolder mb-4 mt-5">I have odd cosmic thoughts every day</h2>
-                <p class="mb-4">For me, the most fascinating interface is Twitter. I have odd cosmic thoughts every day and I realized I could hold them to myself or share them with people who might be interested.</p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <h2 class="fw-bolder mb-4 mt-5">I have odd cosmic thoughts every day</h2>
-                <p class="mb-4">For me, the most fascinating interface is Twitter. I have odd cosmic thoughts every day and I realized I could hold them to myself or share them with people who might be interested.</p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-                <p>
-                  Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today.
-                  Something bad happened there as well.
-                </p>
-              </section>
-            </article>
-            <section class="mb-5">
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bolavoli</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#sepakbola</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#sepakbola</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bulutangksi</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bolavoli</a>
-            </section>
-
-            <!-- <hr class="my-5" /> -->
-
-            <!-- Comments section-->
-            <section class="p-4 rounded-2 border">
-              <h4 class="fw-bold mb-4">Post Comments</h4>
-              <!-- Comment with nested comments-->
-              <div class="d-flex mb-4">
-                <!-- Parent comment-->
-                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/40x40/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <div class="fw-semibold">Commenter Name</div>
-                  If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
-                  <!-- Child comment 1-->
-                  <div class="d-flex mt-4">
-                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/40x40/ced4da/6c757d.jpg" alt="..." /></div>
-                    <div class="ms-3">
-                      <div class="fw-semibold">Commenter Name</div>
-                      And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
-                    </div>
-                  </div>
-                  <!-- Child comment 2-->
-                  <div class="d-flex mt-4">
-                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/40x40/ced4da/6c757d.jpg" alt="..." /></div>
-                    <div class="ms-3">
-                      <div class="fw-semibold">Commenter Name</div>
-                      When you put money directly to a problem, it makes a good headline.
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Single comment-->
-              <div class="d-flex">
-                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/40x40/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <div class="fw-semibold">Commenter Name</div>
-                  When I look at the universe and all the ways the universe wants to kill us, I find it hard to reconcile that with statements of beneficence.
-                </div>
-              </div>
-              <!-- Comment form-->
-              <div class="mt-5">
-                <h5 class="fw-bolder mb-3">Leave The Comment</h5>
-                <form>
-                  <div class="mb-3">
-                    <label for="exampleFormControlInput1" class="form-label">Comment as</label>
-                    <input type="email" class="form-control shadow-sm" id="exampleFormControlInput1" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Your Comment</label>
-                    <textarea class="form-control shadow-sm" id="exampleFormControlTextarea1" rows="3"></textarea>
-                  </div>
-                  <button typ="submit" class="btn btn-dark px-4 rounded-1 shadow-sm">Submit</button>
-                </form>
-              </div>
-            </section>
-
-            <!-- <hr class="my-5 px-3" /> -->
-
-            <!-- Author Section -->
-            <!-- <section>
-                            <div class="d-flex">
-                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/60x60/ced4da/6c757d.jpg" alt="..." /></div>
-                                <div class="ms-3">
-                                    <div class="fw-bold"><a href="#" class="text-decoration-none text-reset">Umam Alfarizi</a></div>
-                                    <span class="text-muted">Bek-N Wengdev</span>
-                                </div>
-                            </div>
-                            <p class="text-secondary mt-3">
-                                Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Maecenas faucibus mollis interdum. Fusce dapibus, tellus ac. Maecenas faucibus mollis
-                                interdum.
-                            </p>
-                            Follow me:
-                        </section> -->
-
-            <!-- <hr class="my-5" /> -->
-
-            <section class="row justify-content-between mt-5 mb-lg-5">
-              <div class="col text-end">
-                <a href="#" class="btn btn-outline-dark rounded-2 px-4 shadow-sm">Prev Post</a>
-              </div>
-              <div class="col text-start">
-                <a href="#" class="btn btn-outline-dark rounded-2 px-4 shadow-sm">Next Post</a>
-              </div>
-            </section>
+        <!-- Side widget 1 -->
+        <div class="col-lg-2 d-none d-lg-block share">
+          <div class="position-sticky" style="top: 4.7rem">
+            <div class="text-end fs-5 mb-3">
+              <a class="share-link text-body-secondary p-1 d-none to-top" href="#top"><i class="bi bi-arrow-up-circle"></i></a>
+            </div>
+            <div class="text-end fs-5 mb-2">
+              <a class="share-link text-body-secondary p-1" href="#"><i class="bi bi-facebook"></i></a>
+            </div>
+            <div class="text-end fs-5 mb-2">
+              <a class="share-link text-body-secondary p-1" href="#"><i class="bi bi-twitter"></i></a>
+            </div>
+            <div class="text-end fs-5 mb-2">
+              <a class="share-link text-body-secondary p-1" href="#"><i class="bi bi-telegram"></i></a>
+            </div>
+            <div class="text-end fs-5 mb-2">
+              <a class="share-link text-body-secondary p-1" href="#"><i class="bi bi-whatsapp"></i></a>
+            </div>
           </div>
         </div>
 
-        <div class="col d-lg-none">
-          <hr class="my-5" />
-        </div>
+        <!-- Main content -->
+        <div class="col-lg-7 px-lg-3">
+          <!-- Post content-->
+          <article>
+            <!-- Post header-->
+            <header class="mb-4">
+              <!-- Post category -->
+              <span class="bg-body-secondary small rounded-4 px-2 py-1">Category</span>
+              <!-- Post title-->
+              <h1 class="fs-1 fw-bold mt-3">Ini Contoh Judul Postingan Blog Pertama yang Bagus</h1>
+              <!-- Post meta content-->
+              <div class="small">Posted by <a href="#" class="text-dark text-decoration-none">Umam Alfarizi</a> on Ahad, 1 Januari 2024</div>
+            </header>
+            <!-- Preview image figure-->
+            <figure class="mb-4"><img class="img-fluid rounded" src="https://dummyimage.com/900x500/ced4da/6c757d.jpg" alt="..." /></figure>
+            <!-- Post content-->
+            <section class="mb-4">
+              <p class="mb-4">Science is an enterprise that should be cherished as an activity of the free human mind. Because it transforms who we are, how we live, and it gives us an understanding of our place in the universe.</p>
+              <p class="mb-4">
+                The universe is large and old, and the ingredients for life as we know it are everywhere, so there's no reason to think that Earth would be unique in that regard. Whether of not the life became intelligent is a different
+                question, and we'll see if we find that.
+              </p>
+              <p class="mb-4">
+                If you get asteroids about a kilometer in size, those are large enough and carry enough energy into our system to disrupt transportation, communication, the food chains, and that can be a really bad day on Earth.
+              </p>
+              <p class="mb-4">
+                If you get asteroids about a kilometer in size, those are large enough and carry enough energy into our system to disrupt transportation, communication, the food chains, and that can be a really bad day on Earth.
+              </p>
+              <p class="mb-4">
+                If you get asteroids about a kilometer in size, those are large enough and carry enough energy into our system to disrupt transportation, communication, the food chains, and that can be a really bad day on Earth.
+              </p>
+              <h2 class="fw-bolder mb-4 mt-5">I have odd cosmic thoughts every day</h2>
+              <p class="mb-4">For me, the most fascinating interface is Twitter. I have odd cosmic thoughts every day and I realized I could hold them to myself or share them with people who might be interested.</p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <h2 class="fw-bolder mb-4 mt-5">I have odd cosmic thoughts every day</h2>
+              <p class="mb-4">For me, the most fascinating interface is Twitter. I have odd cosmic thoughts every day and I realized I could hold them to myself or share them with people who might be interested.</p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+              <p>
+                Venus has a runaway greenhouse effect. I kind of want to know what happened there because we're twirling knobs here on Earth without knowing the consequences of it. Mars once had running water. It's bone dry today. Something
+                bad happened there as well.
+              </p>
+            </section>
+            <section class="tags">
+              <i class="bi bi-tags"></i>
+              <span class="me-2">Tags:</span>
+              <a href="" class="tag-link badge bg-body-secondary text-body-secondary text-decoration-none rounded-4 px-3 py-2">#Tips</a>
+              <a href="" class="tag-link badge bg-body-secondary text-body-secondary text-decoration-none rounded-4 px-3 py-2">#Trik</a>
+            </section>
+          </article>
 
-        <!-- Side widgets-->
-        <div class="col-lg-4">
-          <div class="position-sticky ps-0 ps-lg-3" style="top: 1.5rem">
-            <!-- Search widget-->
-            <div class="pb-4">
-              <h5 class="fw-bold mb-3">Search Post</h5>
-              <div class="input-group">
-                <input class="form-control shadow-sm" type="text" placeholder="Enter keyword..." aria-label="Enter search term..." aria-describedby="button-search" />
-                <button class="btn btn-dark px-4 shadow-sm" id="button-search" type="button">Gas!</button>
-              </div>
+          <!-- Share -->
+          <section class="d-lg-none mt-5">
+            <div class="text-center mb-3">Share to :</div>
+            <div class="text-center">
+              <span class="bg-white py-2 px-1 fs-5 rounded-4 shadow-sm text-body-secondary border">
+                <a class="share-link text-body-secondary p-2 mx-2" href="#"><i class="bi bi-facebook"></i></a>
+                <a class="share-link text-body-secondary p-2 mx-2" href="#"><i class="bi bi-twitter"></i></a>
+                <a class="share-link text-body-secondary p-2 mx-2" href="#"><i class="bi bi-telegram"></i></a>
+                <a class="share-link text-body-secondary p-2 mx-2" href="#"><i class="bi bi-whatsapp"></i></a>
+              </span>
             </div>
+          </section>
 
-            <!-- Related Post -->
-            <div class="py-4 mt-2">
-              <h5 class="fw-bold mb-4">Popular Posts</h5>
-              <div class="d-flex mt-3 pb-2">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Cara Berinteraksi Sosial Melalui Gmeeet</h6>
-                  <div class="small text-muted fst-italic">Feb 3, 22</div>
-                </div>
-              </div>
-              <div class="d-flex mt-3">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Tutorial Internet Gratis 0p0k No Root Work 100%</h6>
-                  <div class="small text-muted fst-italic">Jan 1, 22</div>
-                </div>
-              </div>
-              <div class="d-flex mt-3 pb-2">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Tutorial Internet Gratis 0p0k No Root Work 100%</h6>
-                  <div class="small text-muted fst-italic">Feb 1, 22</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Popular Post -->
-            <div class="py-4 mt-2">
-              <h5 class="fw-bold mb-4">Popular Posts</h5>
-              <div class="d-flex mt-3 pb-2">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Cara Berinteraksi Sosial Melalui Gmeeet</h6>
-                  <div class="small text-muted fst-italic">Feb 3, 22</div>
-                </div>
-              </div>
-              <div class="d-flex mt-3 pb-2">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Tutorial Internet Gratis 0p0k No Root Work 100%</h6>
-                  <div class="small text-muted fst-italic">Feb 1, 22</div>
-                </div>
-              </div>
-              <div class="d-flex mt-3">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Tutorial Internet Gratis 0p0k No Root Work 100%</h6>
-                  <div class="small text-muted fst-italic">Jan 1, 22</div>
-                </div>
-              </div>
-              <div class="d-flex mt-3 pb-2">
-                <div class="flex-shrink-0"><img class="rounded" src="https://dummyimage.com/75x55/ced4da/6c757d.jpg" alt="..." /></div>
-                <div class="ms-3">
-                  <h6 class="mb-0">Tutorial Internet Gratis 0p0k No Root Work 100%</h6>
-                  <div class="small text-muted fst-italic">Feb 1, 22</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Categories widget-->
-            <div class="py-4 mt-2">
-              <h5 class="fw-bold mb-3">Categories</h5>
-              <ul class="list-unstyled m-0 p-0">
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">HTML</div>
-                      <div class="col text-end">20</div>
-                    </div>
-                  </a>
+          <!-- Pagination -->
+          <div class="row mt-5">
+            <nav aria-label="Page navigation">
+              <div class="text-center mb-2">Go to :</div>
+              <ul class="pagination justify-content-center align-items-center">
+                <li class="page-item">
+                  <a class="page-link rounded-start-4 shadow-sm text-body-secondary px-4 py-2" href="#">Prev post</a>
                 </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">CSS</div>
-                      <div class="col text-end">15</div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">Javascript</div>
-                      <div class="col text-end">5</div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">Node JS</div>
-                      <div class="col text-end">5</div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">HTML</div>
-                      <div class="col text-end">20</div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">CSS</div>
-                      <div class="col text-end">15</div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">Javascript</div>
-                      <div class="col text-end">5</div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2 border-bottom">
-                  <a class="text-decoration-none text-reset" href="#!">
-                    <div class="row justify-content-between mb-2">
-                      <div class="col text-start">Node JS</div>
-                      <div class="col text-end">5</div>
-                    </div>
-                  </a>
+                <li class="page-item">
+                  <a class="page-link rounded-end-4 shadow-sm text-body-secondary px-4 py-2" href="#">Next post</a>
                 </li>
               </ul>
-            </div>
-
-            <div class="pt-4 pb-5 mt-2">
-              <h5 class="fw-bold mb-3">Popular Tags</h5>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#Olahraga</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#sepakbola</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#sepakbola</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bulutangksi</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bolavoli</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bulutangksi</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bolavoli</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#sepakbola</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#sepakbola</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bulutangksi</a>
-              <a href="#" class="badge border text-reset px-3 py-2 my-1">#bolavoli</a>
-            </div>
+            </nav>
           </div>
         </div>
+
+        <!-- Side widget 2-->
+        <div class="col-lg-3"></div>
       </div>
     </div>
 
-    <!-- Footer-->
-    <!-- <footer class="mt-5 py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; lezipipell 2023</p></div>
-        </footer> -->
-
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/script.js"></script>
   </body>
 </html>

@@ -28,7 +28,8 @@
                 fileList.innerHTML = "";
 
                 files
-                    .filter(file => file.name !== "index.html")
+                    .filter(file => !["index.html", "readme.md", "README.md"].includes(file.name))
+                    .filter(file => !file.name.startsWith('.'))
                     .forEach(file => {
                         let li = document.createElement("li");
                         li.className = "p-3 bg-gray-50 rounded-lg shadow-sm hover:bg-gray-200 transition";
