@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8" />
+        <title>Snake Game - Improved Version</title>
+        <link rel="stylesheet" href="style.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />
+        <script src="script.js" defer></script>
+    </head>
+    <body>
+        <div class="game-container">
+            <div class="game-header">
+                <h1>Snake Game</h1>
+                <div class="game-stats">
+                    <span class="score">Score: 0</span>
+                    <span class="high-score">High Score: 0</span>
+                </div>
+            </div>
+            <div class="game-wrapper">
+                <div class="play-board"></div>
+                <div class="game-overlay pause-overlay">
+                    <div class="overlay-content">
+                        <h2>Game Paused</h2>
+                        <button class="resume-btn">Resume</button>
+                    </div>
+                </div>
+                <div class="game-overlay game-over-overlay">
+                    <div class="overlay-content">
+                        <h2>Game Over</h2>
+                        <p class="final-score">Your Score: 0</p>
+                        <button class="restart-btn">Restart</button>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="control-row">
+                    <i data-key="ArrowUp" class="fa-solid fa-arrow-up-long"></i>
+                </div>
+                <div class="control-row">
+                    <i data-key="ArrowLeft" class="fa-solid fa-arrow-left-long"></i>
+                    <i data-key="ArrowDown" class="fa-solid fa-arrow-down-long"></i>
+                    <i data-key="ArrowRight" class="fa-solid fa-arrow-right-long"></i>
+                </div>
+            </div>
+            <div class="game-settings">
+                <label>
+                    Difficulty:
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </label>
+                <label>
+                    Speed:
+                    <input type="range" id="speed-control" min="50" max="200" value="125" step="25">
+                </label>
+                <label>
+                    Theme:
+                    <select id="theme-selector">
+                        <option value="">Default</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="forest">Forest</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="sunset">Sunset</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </body>
+</html>
