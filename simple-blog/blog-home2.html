@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | G-Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(214.3 31.8% 91.4%)",
+                        input: "hsl(214.3 31.8% 91.4%)",
+                        ring: "hsl(221.2 83.2% 53.3%)",
+                        background: "hsl(0 0% 100%)",
+                        foreground: "hsl(222.2 84% 4.9%)",
+                        primary: {
+                            DEFAULT: "hsl(221.2 83.2% 53.3%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(210 40% 96.1%)",
+                            foreground: "hsl(222.2 47.4% 11.2%)",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(210 40% 96.1%)",
+                            foreground: "hsl(215.4 16.3% 46.9%)",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(210 40% 96.1%)",
+                            foreground: "hsl(222.2 47.4% 11.2%)",
+                        },
+                        card: {
+                            DEFAULT: "hsl(0 0% 100%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "0.5rem",
+                        md: "calc(0.5rem - 2px)",
+                        sm: "calc(0.5rem - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .hover-card:hover {
+            border-color: hsl(221.2 83.2% 53.3%);
+            box-shadow: 0 0 0 1px hsl(221.2 83.2% 53.3%);
+        }
+        .tag:hover {
+            background-color: hsl(221.2 83.2% 53.3%);
+            color: hsl(210 40% 98%);
+        }
+        .list-view .post-image {
+            width: 120px;
+            height: 80px;
+        }
+        @media (max-width: 768px) {
+            .list-view .post-image {
+                width: 100%;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container mx-auto px-4 flex h-14 items-center max-w-6xl">
+            <div class="mr-4 flex">
+                <a class="flex items-center space-x-2 font-bold" href="/">
+                    G-Blog
+                </a>
+            </div>
+            <div class="flex flex-1 justify-end">
+                <nav class="flex items-center space-x-6 text-sm font-medium">
+                    <a class="transition-colors hover:text-foreground/80 text-foreground hidden sm:inline-block" href="/">Home</a>
+                    <a class="transition-colors hover:text-foreground/80 text-foreground/60 hidden sm:inline-block" href="/blog">Blog</a>
+                    <a class="transition-colors hover:text-foreground/80 text-foreground/60 hidden sm:inline-block" href="/about">About</a>
+                    <button class="sm:hidden inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Sidebar Left - Categories (hidden on mobile) -->
+            <aside class="lg:w-56 shrink-0 hidden lg:block">
+                <div class="sticky top-20 space-y-6">
+                    <!-- Search (visible only in sidebar) -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="search" class="block w-full p-2 pl-10 text-sm rounded-md border bg-background focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Search posts...">
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="space-y-2">
+                        <h4 class="font-medium text-sm px-2">Categories</h4>
+                        <div class="flex flex-col gap-1">
+                            <a class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-gray-100" href="#">
+                                <span>All</span>
+                                <span class="ml-auto text-xs text-gray-500">24</span>
+                            </a>
+                            <a class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-gray-100" href="#">
+                                <span>Technology</span>
+                                <span class="ml-auto text-xs text-gray-500">12</span>
+                            </a>
+                            <a class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-gray-100" href="#">
+                                <span>Programming</span>
+                                <span class="ml-auto text-xs text-gray-500">8</span>
+                            </a>
+                            <a class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-gray-100" href="#">
+                                <span>Design</span>
+                                <span class="ml-auto text-xs text-gray-500">4</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="space-y-2">
+                        <h4 class="font-medium text-sm px-2">Tags</h4>
+                        <div class="flex flex-wrap gap-2 px-2">
+                            <a class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2.5 py-1" href="#">
+                                JavaScript
+                            </a>
+                            <a class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2.5 py-1" href="#">
+                                React
+                            </a>
+                            <a class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2.5 py-1" href="#">
+                                CSS
+                            </a>
+                            <a class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2.5 py-1" href="#">
+                                Tailwind
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1">
+                <div class="space-y-4">
+                    <!-- Mobile Search (hidden on desktop) -->
+                    <div class="relative lg:hidden">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="search" class="block w-full p-2 pl-10 text-sm rounded-md border bg-background focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Search posts...">
+                    </div>
+
+                    <!-- Posts Header with Controls -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <h2 class="text-lg font-semibold">Latest Posts</h2>
+                        <div class="flex items-center gap-2">
+                            <!-- Sort Dropdown -->
+                            <div class="relative text-sm">
+                                <button class="flex items-center gap-1 rounded-md border px-3 py-1.5 hover:bg-gray-50">
+                                    <span>Newest</span>
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </button>
+                                <div class="absolute right-0 mt-1 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 hidden">
+                                    <div class="py-1">
+                                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Newest</a>
+                                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Oldest</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- View Toggle Dropdown -->
+                            <div class="relative text-sm">
+                                <button class="flex items-center gap-1 rounded-md border px-3 py-1.5 hover:bg-gray-50">
+                                    <i class="fas fa-th-large"></i>
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </button>
+                                <div class="absolute right-0 mt-1 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 hidden">
+                                    <div class="py-1">
+                                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100" data-view="card">
+                                            <i class="fas fa-th-large mr-2"></i> Card
+                                        </a>
+                                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100" data-view="list">
+                                            <i class="fas fa-list mr-2"></i> List
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Posts List - Card View -->
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4" id="posts-container">
+                        <!-- Post 1 -->
+                        <article class="hover-card rounded-lg border bg-white transition-all">
+                            <a href="#" class="block">
+                                <div class="relative">
+                                    <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                                         alt="Post image" class="w-full h-40 object-cover rounded-t-lg post-image">
+                                    <span class="absolute top-2 left-2 inline-flex items-center rounded-md bg-primary px-2 py-0.5 text-xs font-medium text-white">
+                                        Technology
+                                    </span>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                                        <span>Jan 1, 2024</span>
+                                        <span>•</span>
+                                        <span>5 min read</span>
+                                    </div>
+                                    <h3 class="text-base font-semibold mb-2 line-clamp-2">Ini Judul Postingan Pertama</h3>
+                                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2 py-0.5">
+                                            Tips
+                                        </span>
+                                        <span class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2 py-0.5">
+                                            Trik
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+
+                        <!-- Post 2 -->
+                        <article class="hover-card rounded-lg border bg-white transition-all">
+                            <a href="#" class="block">
+                                <div class="relative">
+                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                                         alt="Post image" class="w-full h-40 object-cover rounded-t-lg post-image">
+                                    <span class="absolute top-2 left-2 inline-flex items-center rounded-md bg-primary px-2 py-0.5 text-xs font-medium text-white">
+                                        Business
+                                    </span>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                                        <span>Dec 31, 2023</span>
+                                        <span>•</span>
+                                        <span>8 min read</span>
+                                    </div>
+                                    <h3 class="text-base font-semibold mb-2 line-clamp-2">Ini Judul Postingan Kedua</h3>
+                                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2 py-0.5">
+                                            Business
+                                        </span>
+                                        <span class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2 py-0.5">
+                                            Strategy
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+
+                        <!-- Post 3 -->
+                        <article class="hover-card rounded-lg border bg-white transition-all">
+                            <a href="#" class="block">
+                                <div class="p-4">
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                                        <span>Dec 1, 2023</span>
+                                        <span>•</span>
+                                        <span>3 min read</span>
+                                    </div>
+                                    <h3 class="text-base font-semibold mb-2 line-clamp-2">Ini Judul Postingan Ketiga</h3>
+                                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2 py-0.5">
+                                            Life
+                                        </span>
+                                        <span class="tag inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors border border-gray-200 bg-white hover:bg-primary hover:text-white px-2 py-0.5">
+                                            Experience
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex items-center justify-center gap-2 mt-6">
+                        <button class="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left text-sm"></i>
+                        </button>
+                        <button class="inline-flex items-center justify-center rounded-md w-8 h-8 bg-primary text-white text-sm font-medium">1</button>
+                        <button class="inline-flex items-center justify-center rounded-md w-8 h-8 hover:bg-gray-100 text-sm">2</button>
+                        <button class="inline-flex items-center justify-center rounded-md w-8 h-8 hover:bg-gray-100 text-sm">3</button>
+                        <button class="inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100">
+                            <i class="fas fa-chevron-right text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Sidebar Right - Profile -->
+            <aside class="lg:w-64 shrink-0 hidden lg:block">
+                <div class="sticky top-20 space-y-4">
+                    <!-- Profile Card -->
+                    <div class="rounded-lg border bg-white p-4 text-center">
+                        <div class="flex justify-center mb-3">
+                            <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                                 alt="Author" class="w-16 h-16 rounded-full object-cover border-2 border-primary">
+                        </div>
+                        <h3 class="font-semibold text-sm">Umam Alfarizi</h3>
+                        <p class="text-xs text-gray-500 mt-1">Saya seorang pelajar yang berusaha untuk suka belajar</p>
+                        <div class="mt-3 flex justify-center gap-2">
+                            <a class="inline-flex items-center justify-center rounded-full w-7 h-7 hover:bg-gray-100" href="#">
+                                <i class="fab fa-github text-sm"></i>
+                            </a>
+                            <a class="inline-flex items-center justify-center rounded-full w-7 h-7 hover:bg-gray-100" href="#">
+                                <i class="fab fa-twitter text-sm"></i>
+                            </a>
+                            <a class="inline-flex items-center justify-center rounded-full w-7 h-7 hover:bg-gray-100" href="#">
+                                <i class="fab fa-linkedin-in text-sm"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="rounded-lg border bg-white p-4">
+                        <h4 class="font-semibold text-sm mb-1">Subscribe to Newsletter</h4>
+                        <p class="text-xs text-gray-500 mb-3">Get the latest posts delivered right to your inbox</p>
+                        <form class="space-y-2">
+                            <input class="block w-full p-2 text-xs rounded-md border bg-background focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Email address">
+                            <button class="w-full bg-primary text-white text-xs py-2 px-4 rounded-md font-medium hover:bg-primary/90 transition" type="submit">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t mt-8">
+        <div class="container mx-auto px-4 py-4 max-w-6xl">
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm">
+                <div class="mb-2 md:mb-0 text-gray-500">
+                    © 2024 G-Blog. All rights reserved.
+                </div>
+                <div class="flex gap-4">
+                    <a href="#" class="text-gray-500 hover:text-gray-700">Terms</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-700">Privacy</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-700">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle dropdowns
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function() {
+                const dropdown = this.nextElementSibling;
+                if (dropdown && dropdown.classList.contains('hidden')) {
+                    document.querySelectorAll('.hidden[data-dropdown]').forEach(d => d.classList.add('hidden'));
+                    dropdown.classList.remove('hidden');
+                } else if (dropdown) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.relative')) {
+                document.querySelectorAll('.hidden[data-dropdown]').forEach(d => d.classList.add('hidden'));
+            }
+        });
+
+        // View toggle functionality
+        document.querySelectorAll('[data-view]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const view = this.getAttribute('data-view');
+                const container = document.getElementById('posts-container');
+
+                if (view === 'list') {
+                    container.classList.add('list-view');
+                    container.classList.remove('grid-cols-1', 'md:grid-cols-2');
+                    container.classList.add('flex', 'flex-col', 'gap-3');
+                } else {
+                    container.classList.remove('list-view');
+                    container.classList.remove('flex', 'flex-col', 'gap-3');
+                    container.classList.add('grid-cols-1', 'md:grid-cols-2');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
