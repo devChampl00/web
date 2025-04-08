@@ -1,4 +1,3 @@
-// Navbar Transparency & Blur on Scroll + Active Link Highlight
 const navbar = document.querySelector('.navbar');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
@@ -23,14 +22,12 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Mobile Menu Toggle
 const menuBtn = document.getElementById('menu-btn');
 const mobileMenu = document.getElementById('mobile-menu');
 menuBtn.addEventListener('click', () => {
     mobileMenu.classList.toggle('hidden');
 });
 
-// Fade-in Animation on Scroll
 const fadeIns = document.querySelectorAll('.fade-in');
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -41,7 +38,6 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 fadeIns.forEach(fade => observer.observe(fade));
 
-// Modal Functions
 function openModal(id) {
     document.getElementById(id).style.display = 'block';
 }
@@ -50,7 +46,6 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none';
 }
 
-// Form Submission (Placeholder)
 const form = document.getElementById('contact-form');
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -58,7 +53,6 @@ form.addEventListener('submit', (e) => {
     form.reset();
 });
 
-// Theme Toggle Icon Switch
 const themeToggle = document.getElementById('theme-toggle');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 themeToggle.addEventListener('change', () => {
@@ -71,7 +65,6 @@ themeToggle.addEventListener('change', () => {
     }
 });
 
-// Typed.js for Hero
 const typed = new Typed('#typed', {
     strings: ['[Your Profession]', 'Problem Solver', 'Creative Thinker'],
     typeSpeed: 50,
@@ -79,7 +72,6 @@ const typed = new Typed('#typed', {
     loop: true,
 });
 
-// Back to Top Button
 const backToTop = document.getElementById('back-to-top');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 300) {
