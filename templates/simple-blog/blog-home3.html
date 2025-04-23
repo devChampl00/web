@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevBlog | Programming Posts</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .card-transition {
+            transition: all 0.2s ease-in-out;
+        }
+        .card-transition:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="/" class="flex items-center">
+                    <span class="text-xl font-bold font-display text-primary-600">Dev<span class="text-gray-800">Blog</span></span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/" class="text-sm font-medium text-gray-900 hover:text-primary-600 transition">Home</a>
+                    <a href="/blog" class="text-sm font-medium text-primary-600 border-b-2 border-primary-600 pb-0.5">Blog</a>
+                    <a href="/about" class="text-sm font-medium text-gray-900 hover:text-primary-600 transition">About</a>
+                </nav>
+
+                <!-- Mobile Navigation Toggle -->
+                <button id="mobileMenuBtn" class="md:hidden text-gray-700 focus:outline-none">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 py-2 space-y-1 pb-3">
+                <a href="/" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50">Home</a>
+                <a href="/blog" class="block px-4 py-2 text-sm text-primary-600 bg-primary-50">Blog</a>
+                <a href="/about" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50">About</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="flex flex-col md:flex-row gap-8">
+
+            <!-- Left sidebar - Categories -->
+            <aside class="w-full md:w-1/5 md:block">
+                <div class="sticky top-24">
+                    <h2 class="text-lg font-semibold font-display mb-3 flex items-center">
+                        <i class="fa-solid fa-folder text-gray-500 mr-2"></i> Categories
+                    </h2>
+                    <nav class="pl-2 border-l border-gray-200">
+                        <a href="?category=technology"
+                           class="block py-2 px-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                            Technology
+                        </a>
+                        <a href="?category=programming"
+                           class="block py-2 px-3 text-sm bg-primary-50 text-primary-700 font-medium rounded-lg transition">
+                            Programming
+                        </a>
+                        <a href="?category=design"
+                           class="block py-2 px-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                            Design
+                        </a>
+                        <a href="?category=business"
+                           class="block py-2 px-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                            Business
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main content -->
+            <main class="w-full md:w-3/5 order-2 md:order-1">
+                <!-- Search -->
+                <div class="mb-8">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input
+                            type="text"
+                            placeholder="Search posts..."
+                            class="w-full bg-white py-3 pl-10 pr-4 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring focus:ring-primary-100 focus:ring-opacity-50 outline-none"
+                        >
+                    </div>
+                </div>
+
+                <!-- Header -->
+                <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+                    <h1 class="text-xl font-bold font-display">Programming Posts</h1>
+
+                    <div class="flex items-center space-x-2">
+                        <!-- View toggle buttons -->
+                        <div class="flex rounded-lg overflow-hidden border border-gray-200 mr-2">
+                            <button id="gridViewBtn" class="flex items-center justify-center text-xs p-2 w-8 bg-primary-500 text-white">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                            <button id="listViewBtn" class="flex items-center justify-center text-xs p-2 w-8 bg-white text-gray-500 hover:bg-gray-100">
+                                <i class="fa-solid fa-list"></i>
+                            </button>
+                        </div>
+
+                        <!-- Mobile Category Dropdown -->
+                        <div class="relative md:hidden">
+                            <button id="categoryDropdown" class="flex items-center text-sm text-gray-600 hover:text-gray-900 bg-white px-3 py-2 rounded-lg border border-gray-200">
+                                Programming
+                                <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                            </button>
+                            <div id="categoryMenu" class="hidden absolute right-0 mt-2 py-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 z-10">
+                                <a href="?category=technology" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Technology</a>
+                                <a href="?category=programming" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-primary-50">Programming</a>
+                                <a href="?category=design" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Design</a>
+                                <a href="?category=business" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Business</a>
+                            </div>
+                        </div>
+
+                        <!-- Sort Dropdown -->
+                        <div class="relative">
+                            <button id="sortDropdown" class="flex items-center text-sm text-gray-600 hover:text-gray-900 bg-white px-3 py-2 rounded-lg border border-gray-200">
+                                Latest
+                                <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                            </button>
+                            <div id="sortMenu" class="hidden absolute right-0 mt-2 py-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 z-10">
+                                <a href="?order=desc" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-primary-50">Latest</a>
+                                <a href="?order=asc" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Oldest</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid View (Default) -->
+                <div id="gridView" class="space-y-6">
+                    <!-- Post 1 -->
+                    <a href="/introduction-to-javascript" class="block">
+                        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md card-transition overflow-hidden border border-gray-100">
+                            <img src="https://dummyimage.com/800x400/5271ff/ffffff&text=JavaScript+Basics" class="w-full h-48 object-cover" alt="Introduction to JavaScript">
+
+                            <div class="p-6">
+                                <h2 class="text-xl font-bold font-display mb-2 text-gray-900">Introduction to JavaScript</h2>
+
+                                <div class="flex items-center text-xs text-gray-500 mb-3">
+                                    <span class="flex items-center">
+                                        <i class="fa-regular fa-calendar mr-1"></i>
+                                        Mar 15, 2023
+                                    </span>
+                                    <span class="mx-2">•</span>
+                                    <span class="flex items-center">
+                                        <i class="fa-solid fa-folder mr-1"></i>
+                                        Programming
+                                    </span>
+                                </div>
+
+                                <p class="text-gray-600 text-sm mb-4">
+                                    Learn the basics of JavaScript, the programming language of the web. This post covers variables, functions, and basic syntax.
+                                </p>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#javascript</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#webdev</span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+
+                    <!-- Post 2 -->
+                    <a href="/css-grid-layout" class="block">
+                        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md card-transition overflow-hidden border border-gray-100">
+                            <div class="p-6">
+                                <h2 class="text-xl font-bold font-display mb-2 text-gray-900">Mastering CSS Grid Layout</h2>
+
+                                <div class="flex items-center text-xs text-gray-500 mb-3">
+                                    <span class="flex items-center">
+                                        <i class="fa-regular fa-calendar mr-1"></i>
+                                        Feb 28, 2023
+                                    </span>
+                                    <span class="mx-2">•</span>
+                                    <span class="flex items-center">
+                                        <i class="fa-solid fa-folder mr-1"></i>
+                                        Design
+                                    </span>
+                                </div>
+
+                                <p class="text-gray-600 text-sm mb-4">
+                                    A comprehensive guide to CSS Grid Layout, covering all the properties and techniques you need to create modern web layouts.
+                                </p>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#css</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#frontend</span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+
+                    <!-- Post 3 -->
+                    <a href="/nodejs-express-tutorial" class="block">
+                        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md card-transition overflow-hidden border border-gray-100">
+                            <img src="https://dummyimage.com/800x400/20a162/ffffff&text=Node.js+Express" class="w-full h-48 object-cover" alt="Node.js Express Tutorial">
+
+                            <div class="p-6">
+                                <h2 class="text-xl font-bold font-display mb-2 text-gray-900">Building APIs with Node.js and Express</h2>
+
+                                <div class="flex items-center text-xs text-gray-500 mb-3">
+                                    <span class="flex items-center">
+                                        <i class="fa-regular fa-calendar mr-1"></i>
+                                        Jan 10, 2023
+                                    </span>
+                                    <span class="mx-2">•</span>
+                                    <span class="flex items-center">
+                                        <i class="fa-solid fa-folder mr-1"></i>
+                                        Programming
+                                    </span>
+                                </div>
+
+                                <p class="text-gray-600 text-sm mb-4">
+                                    Step-by-step tutorial on creating RESTful APIs using Node.js and Express framework. Learn routing, middleware, and database integration.
+                                </p>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#nodejs</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#backend</span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div id="listView" class="space-y-5 hidden">
+                    <!-- Post 1 - List Style -->
+                    <a href="/introduction-to-javascript" class="block">
+                        <article class="bg-white rounded-xl shadow-sm hover:shadow-md card-transition overflow-hidden border border-gray-100">
+                            <div class="flex flex-col sm:flex-row">
+                                <div class="sm:w-1/3">
+                                    <img src="https://dummyimage.com/800x400/5271ff/ffffff&text=JavaScript+Basics" class="w-full h-40 sm:h-full object-cover" alt="Introduction to JavaScript">
+                                </div>
+                                <div class="p-5 sm:w-2/3">
+                                    <h2 class="text-xl font-bold font-display mb-2 text-gray-900">Introduction to JavaScript</h2>
+
+                                    <div class="flex items-center text-xs text-gray-500 mb-3">
+                                        <span class="flex items-center">
+                                            <i class="fa-regular fa-calendar mr-1"></i>
+                                            Mar 15, 2023
+                                        </span>
+                                        <span class="mx-2">•</span>
+                                        <span class="flex items-center">
+                                            <i class="fa-solid fa-folder mr-1"></i>
+                                            Programming
+                                        </span>
+                                    </div>
+
+                                    <p class="text-gray-600 text-sm mb-4">
+                                        Learn the basics of JavaScript, the programming language of the web. This post covers variables, functions, and basic syntax.
+                                    </p>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#javascript</span>
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#webdev</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+
+                    <!-- Post 2 - List Style -->
+                    <a href="/css-grid-layout" class="block">
+                        <article class="bg-white rounded-xl shadow-sm hover:shadow-md card-transition overflow-hidden border border-gray-100">
+                            <div class="flex flex-col sm:flex-row">
+                                <div class="sm:w-1/3">
+                                    <div class="h-40 sm:h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                        <i class="fa-brands fa-css3 text-5xl text-blue-400"></i>
+                                    </div>
+                                </div>
+                                <div class="p-5 sm:w-2/3">
+                                    <h2 class="text-xl font-bold font-display mb-2 text-gray-900">Mastering CSS Grid Layout</h2>
+
+                                    <div class="flex items-center text-xs text-gray-500 mb-3">
+                                        <span class="flex items-center">
+                                            <i class="fa-regular fa-calendar mr-1"></i>
+                                            Feb 28, 2023
+                                        </span>
+                                        <span class="mx-2">•</span>
+                                        <span class="flex items-center">
+                                            <i class="fa-solid fa-folder mr-1"></i>
+                                            Design
+                                        </span>
+                                    </div>
+
+                                    <p class="text-gray-600 text-sm mb-4">
+                                        A comprehensive guide to CSS Grid Layout, covering all the properties and techniques you need to create modern web layouts.
+                                    </p>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#css</span>
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#frontend</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+
+                    <!-- Post 3 - List Style -->
+                    <a href="/nodejs-express-tutorial" class="block">
+                        <article class="bg-white rounded-xl shadow-sm hover:shadow-md card-transition overflow-hidden border border-gray-100">
+                            <div class="flex flex-col sm:flex-row">
+                                <div class="sm:w-1/3">
+                                    <img src="https://dummyimage.com/800x400/20a162/ffffff&text=Node.js+Express" class="w-full h-40 sm:h-full object-cover" alt="Node.js Express Tutorial">
+                                </div>
+                                <div class="p-5 sm:w-2/3">
+                                    <h2 class="text-xl font-bold font-display mb-2 text-gray-900">Building APIs with Node.js and Express</h2>
+
+                                    <div class="flex items-center text-xs text-gray-500 mb-3">
+                                        <span class="flex items-center">
+                                            <i class="fa-regular fa-calendar mr-1"></i>
+                                            Jan 10, 2023
+                                        </span>
+                                        <span class="mx-2">•</span>
+                                        <span class="flex items-center">
+                                            <i class="fa-solid fa-folder mr-1"></i>
+                                            Programming
+                                        </span>
+                                    </div>
+
+                                    <p class="text-gray-600 text-sm mb-4">
+                                        Step-by-step tutorial on creating RESTful APIs using Node.js and Express framework. Learn routing, middleware, and database integration.
+                                    </p>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#nodejs</span>
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">#backend</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-10 flex justify-center">
+                    <nav class="inline-flex rounded-md shadow">
+                        <a href="?page=1" class="px-4 py-2 bg-white text-sm font-medium text-gray-400 rounded-l-lg border border-gray-200 cursor-not-allowed">
+                            Previous
+                        </a>
+                        <a href="?page=2" class="px-4 py-2 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-r-lg border border-gray-200 border-l-0">
+                            Next
+                        </a>
+                    </nav>
+                </div>
+            </main>
+
+            <!-- Right sidebar -->
+            <aside class="w-full md:w-1/4 order-1 md:order-2">
+                <div class="sticky top-24 space-y-8">
+                    <!-- Profile -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                        <img
+                            src="https://dummyimage.com/200x200/000/fff"
+                            alt="John Doe"
+                            class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white shadow"
+                        >
+                        <h2 class="text-lg font-bold font-display mb-1">John Doe</h2>
+                        <p class="text-gray-500 text-sm italic mb-4">Web Developer & Designer</p>
+
+                        <div class="flex justify-center space-x-3">
+                            <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div>
+                        <h2 class="text-lg font-semibold font-display mb-3 flex items-center">
+                            <i class="fa-solid fa-envelope text-gray-500 mr-2"></i> Contact Me
+                        </h2>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <a href="mailto:example@example.com" class="flex items-center px-4 py-3 hover:bg-gray-50 transition border-b border-gray-100">
+                                <i class="fa-solid fa-envelope text-gray-400 mr-3"></i>
+                                <span class="text-gray-600 text-sm">Email</span>
+                            </a>
+                            <a href="https://github.com/example" class="flex items-center px-4 py-3 hover:bg-gray-50 transition border-b border-gray-100">
+                                <i class="fab fa-github text-gray-400 mr-3"></i>
+                                <span class="text-gray-600 text-sm">Github</span>
+                            </a>
+                            <a href="https://linkedin.com/in/example" class="flex items-center px-4 py-3 hover:bg-gray-50 transition">
+                                <i class="fab fa-linkedin-in text-gray-400 mr-3"></i>
+                                <span class="text-gray-600 text-sm">LinkedIn</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl shadow p-6 text-white">
+                        <h2 class="text-lg font-bold font-display mb-2">Subscribe to Newsletter</h2>
+                        <p class="text-primary-100 text-sm mb-4">Get the latest posts delivered straight to your inbox.</p>
+
+                        <form>
+                            <input
+                                type="email"
+                                placeholder="Your email address"
+                                class="w-full bg-white/10 border border-white/20 text-white placeholder-white/60 p-3 rounded-lg mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/50"
+                            >
+                            <button type="submit" class="w-full bg-white text-primary-600 font-medium py-2 px-4 rounded-lg hover:bg-white/90 transition">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 py-6 mt-16">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2025 DevBlog. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-gray-600">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-600">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-600">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle mobile menu
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+
+        // Toggle grid/list view
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+        const gridView = document.getElementById('gridView');
+        const listView = document.getElementById('listView');
+
+        gridViewBtn.addEventListener('click', function() {
+            gridView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            gridViewBtn.classList.remove('bg-white', 'text-gray-500');
+            gridViewBtn.classList.add('bg-primary-500', 'text-white');
+            listViewBtn.classList.remove('bg-primary-500', 'text-white');
+            listViewBtn.classList.add('bg-white', 'text-gray-500');
+        });
+
+        listViewBtn.addEventListener('click', function() {
+            gridView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            listViewBtn.classList.remove('bg-white', 'text-gray-500');
+            listViewBtn.classList.add('bg-primary-500', 'text-white');
+            gridViewBtn.classList.remove('bg-primary-500', 'text-white');
+            gridViewBtn.classList.add('bg-white', 'text-gray-500');
+        });
+
+        // Toggle dropdowns
+        document.getElementById('categoryDropdown').addEventListener('click', function() {
+            document.getElementById('categoryMenu').classList.toggle('hidden');
+            document.getElementById('sortMenu').classList.add('hidden');
+        });
+
+        document.getElementById('sortDropdown').addEventListener('click', function() {
+            document.getElementById('sortMenu').classList.toggle('hidden');
+            document.getElementById('categoryMenu').classList.add('hidden');
+        });
+
+        // Close dropdowns when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('#categoryDropdown') && !e.target.closest('#categoryMenu')) {
+                document.getElementById('categoryMenu').classList.add('hidden');
+            }
+            if (!e.target.closest('#sortDropdown') && !e.target.closest('#sortMenu')) {
+                document.getElementById('sortMenu').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

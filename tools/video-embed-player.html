@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Video Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#18181b',
+                        'background-secondary': '#09090b',
+                        foreground: '#f4f4f5',
+                        muted: '#3f3f46',
+                        'muted-foreground': '#a1a1aa',
+                        border: '#27272a',
+                        input: '#3f3f46',
+                        'blue-primary': '#3b82f6',
+                        'blue-secondary': '#2563eb',
+                        'purple-primary': '#9333ea',
+                        'purple-secondary': '#7e22ce',
+                        'card-bg': 'rgba(39, 39, 42, 0.5)',
+                        'card-border': '#3f3f46',
+                        'card-hover-border': 'rgba(147, 51, 234, 0.5)',
+                        'card-hover-shadow': 'rgba(147, 51, 234, 0.1)',
+                    },
+                    fontFamily: {
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #3f3f46;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #52525b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #71717a;
+        }
+
+        /* Smooth transitions */
+        .transition-slow {
+            transition: all 0.5s ease;
+        }
+
+        /* Aspect ratio for video container */
+        .video-container {
+            aspect-ratio: 16/9;
+        }
+
+        /* Custom glow effect for focus */
+        .focus-glow:focus {
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.5);
+        }
+
+        /* Custom card hover effect */
+        .video-card:hover {
+            border-color: rgba(147, 51, 234, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(147, 51, 234, 0.1), 0 2px 4px -1px rgba(147, 51, 234, 0.06);
+        }
+
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(39, 39, 42, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-light text-foreground mb-2">Minimal Video Player</h1>
+            <p class="text-muted-foreground">Paste any embed iframe to watch videos</p>
+        </header>
+
+        <div class="glass rounded-xl shadow-lg overflow-hidden transition-slow border border-border">
+            <!-- Video Input Section -->
+            <div class="p-6 border-b border-border">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label for="iframe-input" class="block text-sm font-medium text-muted-foreground mb-1">Video Embed Code</label>
+                        <div class="flex">
+                            <input
+                                type="text"
+                                id="iframe-input"
+                                placeholder="Paste iframe embed code here..."
+                                class="flex-1 px-4 py-2 bg-input text-foreground border border-border rounded-l-lg focus-glow focus:outline-none focus:border-purple-primary transition-slow placeholder-muted-foreground"
+                            >
+                            <button
+                                id="load-btn"
+                                class="px-4 py-2 bg-purple-primary text-white rounded-r-lg hover:bg-purple-secondary focus:outline-none focus:ring-2 focus:ring-purple-primary focus:ring-opacity-50 transition-slow"
+                            >
+                                <i class="fas fa-play mr-1"></i> Load
+                            </button>
+                        </div>
+                        <p class="mt-2 text-xs text-muted-foreground">Example: &lt;iframe src="https://www.youtube.com/embed/VIDEO_ID"&gt;&lt;/iframe&gt;</p>
+                    </div>
+                    <div class="md:w-48">
+                        <label for="aspect-ratio" class="block text-sm font-medium text-muted-foreground mb-1">Aspect Ratio</label>
+                        <select
+                            id="aspect-ratio"
+                            class="w-full px-4 py-2 bg-input text-foreground border border-border rounded-lg focus-glow focus:outline-none focus:border-purple-primary transition-slow"
+                        >
+                            <option value="16/9">16:9 (Widescreen)</option>
+                            <option value="4/3">4:3 (Standard)</option>
+                            <option value="1/1">1:1 (Square)</option>
+                            <option value="21/9">21:9 (Ultrawide)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Player Section -->
+            <div class="p-6">
+                <div id="video-placeholder" class="bg-background-secondary rounded-lg flex items-center justify-center video-container transition-slow border border-border">
+                    <div class="text-center p-8">
+                        <i class="fas fa-film text-4xl text-muted mb-4"></i>
+                        <h3 class="text-xl font-light text-muted-foreground mb-2">No video loaded</h3>
+                        <p class="text-muted">Paste an embed code above to watch videos</p>
+                    </div>
+                </div>
+
+                <div id="video-container" class="hidden video-container">
+                    <!-- Video will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="p-4 bg-background-secondary border-t border-border flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <button id="toggle-fullscreen" class="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-slow">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button id="toggle-theme" class="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-slow">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+                <div class="text-sm text-muted-foreground">
+                    <span id="video-source">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Videos Section -->
+        <div id="recent-videos" class="mt-8 hidden">
+            <h2 class="text-2xl font-light text-foreground mb-4">Recent Videos</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Recent videos will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const iframeInput = document.getElementById('iframe-input');
+            const loadBtn = document.getElementById('load-btn');
+            const videoPlaceholder = document.getElementById('video-placeholder');
+            const videoContainer = document.getElementById('video-container');
+            const aspectRatioSelect = document.getElementById('aspect-ratio');
+            const toggleFullscreenBtn = document.getElementById('toggle-fullscreen');
+            const toggleThemeBtn = document.getElementById('toggle-theme');
+            const videoSourceSpan = document.getElementById('video-source');
+            const recentVideosSection = document.getElementById('recent-videos');
+            const recentVideosGrid = recentVideosSection.querySelector('.grid');
+
+            // State
+            let isDarkMode = true; // Start with dark mode
+            let currentVideoUrl = '';
+            let recentVideos = JSON.parse(localStorage.getItem('recentVideos')) || [];
+
+            // Initialize
+            updateRecentVideosUI();
+
+            // Event Listeners
+            loadBtn.addEventListener('click', loadVideo);
+            iframeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') loadVideo();
+            });
+
+            aspectRatioSelect.addEventListener('change', function() {
+                const ratio = this.value.split('/');
+                videoContainer.style.aspectRatio = this.value;
+                videoPlaceholder.style.aspectRatio = this.value;
+            });
+
+            toggleFullscreenBtn.addEventListener('click', toggleFullscreen);
+            toggleThemeBtn.addEventListener('click', toggleTheme);
+
+            // Functions
+            function loadVideo() {
+                const iframeCode = iframeInput.value.trim();
+                if (!iframeCode) return;
+
+                // Extract src from iframe
+                const srcMatch = iframeCode.match(/src="([^"]+)"/);
+                if (!srcMatch || !srcMatch[1]) {
+                    alert('Invalid iframe code. Please paste a valid embed code.');
+                    return;
+                }
+
+                const videoUrl = srcMatch[1];
+                currentVideoUrl = videoUrl;
+
+                // Create iframe
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('src', videoUrl);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.className = 'w-full h-full rounded-lg bg-background-secondary';
+
+                // Clear previous video and add new one
+                videoContainer.innerHTML = '';
+                videoContainer.appendChild(iframe);
+
+                // Show video and hide placeholder
+                videoPlaceholder.classList.add('hidden');
+                videoContainer.classList.remove('hidden');
+
+                // Update video source display
+                updateVideoSource(videoUrl);
+
+                // Add to recent videos
+                addToRecentVideos(iframeCode, videoUrl);
+            }
+
+            function updateVideoSource(url) {
+                try {
+                    const domain = new URL(url).hostname.replace('www.', '');
+                    videoSourceSpan.textContent = `Source: ${domain}`;
+                } catch {
+                    videoSourceSpan.textContent = `Source: Unknown`;
+                }
+            }
+
+            function addToRecentVideos(iframeCode, url) {
+                // Check if already exists
+                const existingIndex = recentVideos.findIndex(v => v.url === url);
+                if (existingIndex >= 0) {
+                    recentVideos.splice(existingIndex, 1);
+                }
+
+                // Add to beginning
+                recentVideos.unshift({
+                    iframe: iframeCode,
+                    url: url,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Keep only last 6
+                if (recentVideos.length > 6) {
+                    recentVideos = recentVideos.slice(0, 6);
+                }
+
+                // Save to localStorage
+                localStorage.setItem('recentVideos', JSON.stringify(recentVideos));
+
+                // Update UI
+                updateRecentVideosUI();
+            }
+
+            function updateRecentVideosUI() {
+                if (recentVideos.length === 0) {
+                    recentVideosSection.classList.add('hidden');
+                    return;
+                }
+
+                recentVideosSection.classList.remove('hidden');
+                recentVideosGrid.innerHTML = '';
+
+                recentVideos.forEach(video => {
+                    const card = document.createElement('div');
+                    card.className = 'video-card bg-card-bg rounded-lg border border-card-border overflow-hidden hover:shadow-md transition-slow cursor-pointer';
+
+                    // Extract thumbnail if YouTube
+                    let thumbnailUrl = '';
+                    if (video.url.includes('youtube.com') || video.url.includes('youtu.be')) {
+                        const videoId = video.url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)[1];
+                        thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="relative aspect-video bg-background-secondary">
+                            ${thumbnailUrl ?
+                                `<img src="${thumbnailUrl}" alt="Thumbnail" class="w-full h-full object-cover">` :
+                                `<div class="w-full h-full flex items-center justify-center text-muted"><i class="fas fa-video text-3xl"></i></div>`
+                            }
+                            <button class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black bg-opacity-30 transition-slow">
+                                <i class="fas fa-play text-white text-4xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="text-sm font-medium text-foreground truncate">${extractDomain(video.url)}</h3>
+                            <p class="text-xs text-muted-foreground">${formatDate(video.timestamp)}</p>
+                        </div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        iframeInput.value = video.iframe;
+                        loadVideo();
+                    });
+
+                    recentVideosGrid.appendChild(card);
+                });
+            }
+
+            function extractDomain(url) {
+                try {
+                    const domain = new URL(url).hostname.replace('www.', '');
+                    return domain;
+                } catch {
+                    return 'Unknown Source';
+                }
+            }
+
+            function formatDate(isoString) {
+                const date = new Date(isoString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+
+            function toggleFullscreen() {
+                if (!document.fullscreenElement && videoContainer.querySelector('iframe')) {
+                    videoContainer.requestFullscreen().catch(err => {
+                        alert(`Error attempting to enable fullscreen: ${err.message}`);
+                    });
+                    toggleFullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
+                    document.exitFullscreen();
+                    toggleFullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            }
+
+            function toggleTheme() {
+                isDarkMode = !isDarkMode;
+
+                if (isDarkMode) {
+                    document.documentElement.classList.add('dark');
+                    document.body.classList.remove('bg-gray-50');
+                    document.body.classList.add('bg-background');
+                    toggleThemeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.body.classList.remove('bg-background');
+                    document.body.classList.add('bg-gray-50');
+                    toggleThemeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            }
+
+            // Handle fullscreen change events
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    toggleFullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
