@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Image Processing: Dilation & Erosion Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pixel {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #e5e7eb;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pixel:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        .kernel-cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #e5e7eb;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+        }
+        .active-kernel {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .grid-container {
+            display: inline-grid;
+            grid-template-columns: repeat(var(--cols), 30px);
+            grid-gap: 0;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .pixel.active {
+            background-color: #000;
+            color: white;
+        }
+        .result-pixel {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #e5e7eb;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-pixel.active {
+            background-color: #000;
+            color: white;
+        }
+        .processing-animation {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { background-color: #f3f4f6; }
+            50% { background-color: #d1d5db; }
+            100% { background-color: #f3f4f6; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-image mr-2 text-blue-500"></i>
+                Digital Image Processing Visualizer
+            </h1>
+            <p class="text-lg text-gray-600">
+                Interactive visualization of Dilation and Erosion morphological operations
+            </p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-wrap gap-4 mb-6">
+                <div class="w-full md:w-1/2">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">Image Grid</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Grid Size</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="gridRows" min="3" max="15" value="7" class="w-20 px-3 py-2 border rounded-md">
+                            <span class="self-center">×</span>
+                            <input type="number" id="gridCols" min="3" max="15" value="7" class="w-20 px-3 py-2 border rounded-md">
+                            <button id="updateGrid" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                                Update Grid
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Draw Mode</label>
+                        <div class="flex gap-2">
+                            <button id="drawMode" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                                <i class="fas fa-pencil-alt mr-2"></i>Draw
+                            </button>
+                            <button id="eraseMode" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                                <i class="fas fa-eraser mr-2"></i>Erase
+                            </button>
+                            <button id="clearGrid" class="bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition">
+                                <i class="fas fa-trash-alt mr-2"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div id="imageGrid" class="grid-container mb-4" style="--cols: 7"></div>
+                </div>
+
+                <div class="w-full md:w-1/2">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">Structuring Element (Kernel)</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kernel Size</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="kernelSize" min="1" max="5" value="3" class="w-20 px-3 py-2 border rounded-md">
+                            <button id="updateKernel" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                                Update Kernel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kernel Shape</label>
+                        <div class="flex gap-2 flex-wrap">
+                            <button id="squareKernel" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                                <i class="fas fa-square mr-2"></i>Square
+                            </button>
+                            <button id="crossKernel" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                                <i class="fas fa-plus mr-2"></i>Cross
+                            </button>
+                            <button id="circleKernel" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                                <i class="fas fa-circle mr-2"></i>Circle
+                            </button>
+                            <button id="customKernel" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-md hover:bg-blue-200 transition">
+                                <i class="fas fa-edit mr-2"></i>Custom
+                            </button>
+                        </div>
+                    </div>
+                    <div id="kernelGrid" class="grid-container mb-4" style="--cols: 3"></div>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i> Click on kernel cells to toggle them on/off in custom mode
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t pt-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Morphological Operations</h2>
+
+                <div class="flex border-b mb-4">
+                    <button class="tab-btn px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-500" data-tab="dilation">
+                        <i class="fas fa-expand mr-2"></i>Dilation
+                    </button>
+                    <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-blue-600" data-tab="erosion">
+                        <i class="fas fa-compress mr-2"></i>Erosion
+                    </button>
+                    <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-blue-600" data-tab="comparison">
+                        <i class="fas fa-columns mr-2"></i>Comparison
+                    </button>
+                </div>
+
+                <div id="dilation" class="tab-content active">
+                    <div class="mb-4">
+                        <p class="text-gray-700 mb-3">
+                            <strong>Dilation</strong> expands the boundaries of the foreground pixels (white). It's the union of all translations of the structuring element centered on the foreground pixels.
+                        </p>
+                        <button id="applyDilation" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">
+                            <i class="fas fa-play mr-2"></i>Apply Dilation
+                        </button>
+                    </div>
+                    <div id="dilationResult" class="grid-container processing-animation" style="--cols: 7"></div>
+                </div>
+
+                <div id="erosion" class="tab-content">
+                    <div class="mb-4">
+                        <p class="text-gray-700 mb-3">
+                            <strong>Erosion</strong> shrinks the boundaries of the foreground pixels (white). It's the set of all points where the structuring element fits entirely within the foreground.
+                        </p>
+                        <button id="applyErosion" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">
+                            <i class="fas fa-play mr-2"></i>Apply Erosion
+                        </button>
+                    </div>
+                    <div id="erosionResult" class="grid-container processing-animation" style="--cols: 7"></div>
+                </div>
+
+                <div id="comparison" class="tab-content">
+                    <div class="mb-4">
+                        <p class="text-gray-700 mb-3">
+                            Compare the effects of <strong>dilation</strong> and <strong>erosion</strong> side by side.
+                        </p>
+                        <div class="flex gap-4">
+                            <div>
+                                <h3 class="font-medium text-gray-700 mb-2">Original Image</h3>
+                                <div id="originalForComparison" class="grid-container" style="--cols: 7"></div>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-700 mb-2">Dilation Result</h3>
+                                <div id="dilationComparison" class="grid-container processing-animation" style="--cols: 7"></div>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-700 mb-2">Erosion Result</h3>
+                                <div id="erosionComparison" class="grid-container processing-animation" style="--cols: 7"></div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button id="compareBoth" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">
+                                <i class="fas fa-sync-alt mr-2"></i>Compare Both Operations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">
+                <i class="fas fa-graduation-cap mr-2 text-blue-500"></i>
+                Theory Behind Dilation and Erosion
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-blue-700 mb-2">
+                        <i class="fas fa-expand mr-2"></i>Dilation
+                    </h3>
+                    <p class="text-gray-700 mb-2">
+                        Dilation is one of the fundamental operations in mathematical morphology. It is typically applied to binary images (black and white), but there are versions that work on grayscale images.
+                    </p>
+                    <p class="text-gray-700 mb-2">
+                        The effect of the operator is to gradually <strong>expand</strong> the boundaries of regions of foreground pixels (white). Thus areas of foreground pixels grow in size while holes within those regions become smaller.
+                    </p>
+                    <p class="text-gray-700">
+                        Mathematically, dilation is defined as: <br>
+                        <code class="bg-gray-100 px-2 py-1 rounded">A ⊕ B = { z | (B̂)ₓ ∩ A ≠ ∅ }</code><br>
+                        where A is the image, B is the structuring element, and B̂ is the reflection of B.
+                    </p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-green-700 mb-2">
+                        <i class="fas fa-compress mr-2"></i>Erosion
+                    </h3>
+                    <p class="text-gray-700 mb-2">
+                        Erosion is the second fundamental operation in mathematical morphology. Like dilation, it is normally applied to binary images.
+                    </p>
+                    <p class="text-gray-700 mb-2">
+                        The effect of the operator is to <strong>erode</strong> away the boundaries of regions of foreground pixels (white). Thus areas of foreground pixels shrink in size, and holes within those regions become larger.
+                    </p>
+                    <p class="text-gray-700">
+                        Mathematically, erosion is defined as: <br>
+                        <code class="bg-gray-100 px-2 py-1 rounded">A ⊖ B = { z | Bₓ ⊆ A }</code><br>
+                        where A is the image and B is the structuring element.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-gray-500 text-sm mt-8">
+            <p>Digital Image Processing Visualizer &copy; 2023 | Created with HTML, CSS, and JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize variables
+        let gridRows = 7;
+        let gridCols = 7;
+        let kernelSize = 3;
+        let drawMode = true;
+        let kernelType = 'square'; // 'square', 'cross', 'circle', 'custom'
+        let kernelMatrix = [];
+
+        // DOM elements
+        const imageGrid = document.getElementById('imageGrid');
+        const kernelGrid = document.getElementById('kernelGrid');
+        const gridRowsInput = document.getElementById('gridRows');
+        const gridColsInput = document.getElementById('gridCols');
+        const kernelSizeInput = document.getElementById('kernelSize');
+        const updateGridBtn = document.getElementById('updateGrid');
+        const updateKernelBtn = document.getElementById('updateKernel');
+        const drawModeBtn = document.getElementById('drawMode');
+        const eraseModeBtn = document.getElementById('eraseMode');
+        const clearGridBtn = document.getElementById('clearGrid');
+        const squareKernelBtn = document.getElementById('squareKernel');
+        const crossKernelBtn = document.getElementById('crossKernel');
+        const circleKernelBtn = document.getElementById('circleKernel');
+        const customKernelBtn = document.getElementById('customKernel');
+        const applyDilationBtn = document.getElementById('applyDilation');
+        const applyErosionBtn = document.getElementById('applyErosion');
+        const compareBothBtn = document.getElementById('compareBoth');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Initialize the application
+        function init() {
+            createImageGrid(gridRows, gridCols);
+            createKernelGrid(kernelSize);
+            updateKernelMatrix();
+
+            // Set default kernel to square
+            setSquareKernel();
+
+            // Set event listeners
+            setupEventListeners();
+        }
+
+        // Create the image grid
+        function createImageGrid(rows, cols) {
+            imageGrid.style.setProperty('--cols', cols);
+            imageGrid.innerHTML = '';
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel';
+                    pixel.dataset.row = i;
+                    pixel.dataset.col = j;
+                    imageGrid.appendChild(pixel);
+                }
+            }
+        }
+
+        // Create the kernel grid
+        function createKernelGrid(size) {
+            kernelGrid.style.setProperty('--cols', size);
+            kernelGrid.innerHTML = '';
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'kernel-cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    kernelGrid.appendChild(cell);
+                }
+            }
+        }
+
+        // Update the kernel matrix based on current kernel type
+        function updateKernelMatrix() {
+            const size = kernelSize;
+            kernelMatrix = Array(size).fill().map(() => Array(size).fill(0));
+
+            const center = Math.floor(size / 2);
+
+            switch (kernelType) {
+                case 'square':
+                    // All cells are active
+                    for (let i = 0; i < size; i++) {
+                        for (let j = 0; j < size; j++) {
+                            kernelMatrix[i][j] = 1;
+                        }
+                    }
+                    break;
+
+                case 'cross':
+                    // Center row and column are active
+                    for (let i = 0; i < size; i++) {
+                        kernelMatrix[center][i] = 1; // Horizontal line
+                        kernelMatrix[i][center] = 1; // Vertical line
+                    }
+                    break;
+
+                case 'circle':
+                    // Cells within radius from center are active
+                    const radius = Math.floor(size / 2);
+                    for (let i = 0; i < size; i++) {
+                        for (let j = 0; j < size; j++) {
+                            const distance = Math.sqrt(Math.pow(i - center, 2) + Math.pow(j - center, 2));
+                            if (distance <= radius) {
+                                kernelMatrix[i][j] = 1;
+                            }
+                        }
+                    }
+                    break;
+
+                case 'custom':
+                    // Keep current kernelMatrix as is (will be updated by clicks)
+                    break;
+            }
+
+            updateKernelGridDisplay();
+        }
+
+        // Update the visual display of the kernel grid
+        function updateKernelGridDisplay() {
+            const cells = kernelGrid.querySelectorAll('.kernel-cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+
+                if (kernelMatrix[row][col] === 1) {
+                    cell.classList.add('active-kernel');
+                    cell.innerHTML = '1';
+                } else {
+                    cell.classList.remove('active-kernel');
+                    cell.innerHTML = '0';
+                }
+            });
+        }
+
+        // Set square kernel
+        function setSquareKernel() {
+            kernelType = 'square';
+            updateKernelMatrix();
+            updateButtonStyles();
+        }
+
+        // Set cross kernel
+        function setCrossKernel() {
+            kernelType = 'cross';
+            updateKernelMatrix();
+            updateButtonStyles();
+        }
+
+        // Set circle kernel
+        function setCircleKernel() {
+            kernelType = 'circle';
+            updateKernelMatrix();
+            updateButtonStyles();
+        }
+
+        // Set custom kernel
+        function setCustomKernel() {
+            kernelType = 'custom';
+            // Initialize with all zeros
+            kernelMatrix = Array(kernelSize).fill().map(() => Array(kernelSize).fill(0));
+            updateKernelGridDisplay();
+            updateButtonStyles();
+        }
+
+        // Update button styles based on current mode
+        function updateButtonStyles() {
+            // Drawing mode buttons
+            drawModeBtn.className = drawMode ?
+                'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition' :
+                'bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition';
+            eraseModeBtn.className = !drawMode ?
+                'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition' :
+                'bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition';
+
+            // Kernel type buttons
+            squareKernelBtn.className = kernelType === 'square' ?
+                'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition' :
+                'bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition';
+            crossKernelBtn.className = kernelType === 'cross' ?
+                'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition' :
+                'bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition';
+            circleKernelBtn.className = kernelType === 'circle' ?
+                'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition' :
+                'bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition';
+            customKernelBtn.className = kernelType === 'custom' ?
+                'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition' :
+                'bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 transition';
+        }
+
+        // Get current image matrix
+        function getImageMatrix() {
+            const matrix = Array(gridRows).fill().map(() => Array(gridCols).fill(0));
+            const pixels = imageGrid.querySelectorAll('.pixel');
+
+            pixels.forEach(pixel => {
+                const row = parseInt(pixel.dataset.row);
+                const col = parseInt(pixel.dataset.col);
+                matrix[row][col] = pixel.classList.contains('active') ? 1 : 0;
+            });
+
+            return matrix;
+        }
+
+        // Apply dilation to the image
+        function applyDilation() {
+            const imageMatrix = getImageMatrix();
+            const resultMatrix = Array(gridRows).fill().map(() => Array(gridCols).fill(0));
+
+            const kernelCenter = Math.floor(kernelSize / 2);
+
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    // If current pixel is active, apply the kernel
+                    if (imageMatrix[i][j] === 1) {
+                        for (let ki = 0; ki < kernelSize; ki++) {
+                            for (let kj = 0; kj < kernelSize; kj++) {
+                                if (kernelMatrix[ki][kj] === 1) {
+                                    const targetRow = i + (ki - kernelCenter);
+                                    const targetCol = j + (kj - kernelCenter);
+
+                                    // Check if target position is within bounds
+                                    if (targetRow >= 0 && targetRow < gridRows &&
+                                        targetCol >= 0 && targetCol < gridCols) {
+                                        resultMatrix[targetRow][targetCol] = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            displayResult('dilationResult', resultMatrix);
+        }
+
+        // Apply erosion to the image
+        function applyErosion() {
+            const imageMatrix = getImageMatrix();
+            const resultMatrix = Array(gridRows).fill().map(() => Array(gridCols).fill(0));
+
+            const kernelCenter = Math.floor(kernelSize / 2);
+
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    let fits = true;
+
+                    // Check if kernel fits entirely within foreground at this position
+                    for (let ki = 0; ki < kernelSize && fits; ki++) {
+                        for (let kj = 0; kj < kernelSize && fits; kj++) {
+                            if (kernelMatrix[ki][kj] === 1) {
+                                const targetRow = i + (ki - kernelCenter);
+                                const targetCol = j + (kj - kernelCenter);
+
+                                // Check if target position is within bounds and active
+                                if (targetRow < 0 || targetRow >= gridRows ||
+                                    targetCol < 0 || targetCol >= gridCols ||
+                                    imageMatrix[targetRow][targetCol] !== 1) {
+                                    fits = false;
+                                }
+                            }
+                        }
+                    }
+
+                    if (fits) {
+                        resultMatrix[i][j] = 1;
+                    }
+                }
+            }
+
+            displayResult('erosionResult', resultMatrix);
+        }
+
+        // Compare both operations
+        function compareBothOperations() {
+            const imageMatrix = getImageMatrix();
+
+            // Display original in comparison tab
+            displayResult('originalForComparison', imageMatrix);
+
+            // Apply and display dilation
+            const dilationMatrix = Array(gridRows).fill().map(() => Array(gridCols).fill(0));
+            const erosionMatrix = Array(gridRows).fill().map(() => Array(gridCols).fill(0));
+
+            const kernelCenter = Math.floor(kernelSize / 2);
+
+            // Dilation
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    if (imageMatrix[i][j] === 1) {
+                        for (let ki = 0; ki < kernelSize; ki++) {
+                            for (let kj = 0; kj < kernelSize; kj++) {
+                                if (kernelMatrix[ki][kj] === 1) {
+                                    const targetRow = i + (ki - kernelCenter);
+                                    const targetCol = j + (kj - kernelCenter);
+
+                                    if (targetRow >= 0 && targetRow < gridRows &&
+                                        targetCol >= 0 && targetCol < gridCols) {
+                                        dilationMatrix[targetRow][targetCol] = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Erosion
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    let fits = true;
+
+                    for (let ki = 0; ki < kernelSize && fits; ki++) {
+                        for (let kj = 0; kj < kernelSize && fits; kj++) {
+                            if (kernelMatrix[ki][kj] === 1) {
+                                const targetRow = i + (ki - kernelCenter);
+                                const targetCol = j + (kj - kernelCenter);
+
+                                if (targetRow < 0 || targetRow >= gridRows ||
+                                    targetCol < 0 || targetCol >= gridCols ||
+                                    imageMatrix[targetRow][targetCol] !== 1) {
+                                    fits = false;
+                                }
+                            }
+                        }
+                    }
+
+                    if (fits) {
+                        erosionMatrix[i][j] = 1;
+                    }
+                }
+            }
+
+            displayResult('dilationComparison', dilationMatrix);
+            displayResult('erosionComparison', erosionMatrix);
+        }
+
+        // Display result in a grid
+        function displayResult(elementId, resultMatrix) {
+            const resultGrid = document.getElementById(elementId);
+            resultGrid.style.setProperty('--cols', gridCols);
+            resultGrid.innerHTML = '';
+
+            // Remove processing animation class
+            resultGrid.classList.remove('processing-animation');
+
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'result-pixel';
+                    if (resultMatrix[i][j] === 1) {
+                        pixel.classList.add('active');
+                    }
+                    resultGrid.appendChild(pixel);
+                }
+            }
+        }
+
+        // Clear the image grid
+        function clearImageGrid() {
+            const pixels = imageGrid.querySelectorAll('.pixel');
+            pixels.forEach(pixel => {
+                pixel.classList.remove('active');
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Grid size update
+            updateGridBtn.addEventListener('click', () => {
+                gridRows = parseInt(gridRowsInput.value);
+                gridCols = parseInt(gridColsInput.value);
+                createImageGrid(gridRows, gridCols);
+            });
+
+            // Kernel size update
+            updateKernelBtn.addEventListener('click', () => {
+                kernelSize = parseInt(kernelSizeInput.value);
+                createKernelGrid(kernelSize);
+                updateKernelMatrix();
+            });
+
+            // Drawing mode
+            drawModeBtn.addEventListener('click', () => {
+                drawMode = true;
+                updateButtonStyles();
+            });
+
+            eraseModeBtn.addEventListener('click', () => {
+                drawMode = false;
+                updateButtonStyles();
+            });
+
+            clearGridBtn.addEventListener('click', clearImageGrid);
+
+            // Kernel types
+            squareKernelBtn.addEventListener('click', setSquareKernel);
+            crossKernelBtn.addEventListener('click', setCrossKernel);
+            circleKernelBtn.addEventListener('click', setCircleKernel);
+            customKernelBtn.addEventListener('click', setCustomKernel);
+
+            // Image grid interaction
+            imageGrid.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('pixel')) {
+                    e.preventDefault(); // Prevent text selection
+                    handlePixelClick(e.target);
+
+                    // Set up mouse move for drawing
+                    const handleMouseMove = (moveEvent) => {
+                        if (moveEvent.target.classList.contains('pixel')) {
+                            handlePixelClick(moveEvent.target);
+                        }
+                    };
+
+                    const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                    };
+
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                }
+            });
+
+            // Kernel grid interaction (for custom kernel)
+            kernelGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('kernel-cell') && kernelType === 'custom') {
+                    const row = parseInt(e.target.dataset.row);
+                    const col = parseInt(e.target.dataset.col);
+                    kernelMatrix[row][col] = kernelMatrix[row][col] === 1 ? 0 : 1;
+                    updateKernelGridDisplay();
+                }
+            });
+
+            // Operation buttons
+            applyDilationBtn.addEventListener('click', applyDilation);
+            applyErosionBtn.addEventListener('click', applyErosion);
+            compareBothBtn.addEventListener('click', compareBothOperations);
+
+            // Tab switching
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-500'));
+                    tabBtns.forEach(b => b.classList.add('text-gray-600', 'hover:text-blue-600'));
+                    btn.classList.remove('text-gray-600', 'hover:text-blue-600');
+                    btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-500');
+
+                    // Update active tab content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Handle pixel click (draw/erase)
+        function handlePixelClick(pixel) {
+            if (drawMode) {
+                pixel.classList.add('active');
+            } else {
+                pixel.classList.remove('active');
+            }
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
