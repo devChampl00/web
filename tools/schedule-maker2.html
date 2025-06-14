@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Schedule Planner | Elegant Daily Organizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            100: '#f0f9ff',
+                            200: '#e0f2fe',
+                            300: '#bae6fd',
+                            400: '#7dd3fc',
+                            500: '#38bdf8',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        secondary: {
+                            100: '#fffbeb',
+                            200: '#fef3c7',
+                            300: '#fde68a',
+                            400: '#fcd34d',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .animate-pop {
+                @apply transition-all duration-200 ease-in-out hover:scale-[1.02] active:scale-[0.98];
+            }
+            .glass-effect {
+                @apply backdrop-blur-lg bg-white/90 dark:bg-gray-800/80;
+            }
+            .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #9ca3af #f3f4f6;
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+                @apply w-2;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                @apply bg-gray-100;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                @apply bg-gray-300 rounded-full hover:bg-gray-400;
+            }
+            .theme-light {
+                --schedule-bg: #ffffff;
+                --schedule-text: #1f2937;
+                --schedule-border: #e5e7eb;
+                --schedule-header: #f3f4f6;
+                --schedule-time: #6b7280;
+                --schedule-event-text: #1f2937;
+            }
+            .theme-dark {
+                --schedule-bg: #111827;
+                --schedule-text: #f9fafb;
+                --schedule-border: #374151;
+                --schedule-header: #1f2937;
+                --schedule-time: #9ca3af;
+                --schedule-event-text: #f9fafb;
+            }
+            .theme-rose {
+                --schedule-bg: #fff1f2;
+                --schedule-text: #881337;
+                --schedule-border: #fbcfe8;
+                --schedule-header: #ffe4e6;
+                --schedule-time: #be185d;
+                --schedule-event-text: #881337;
+            }
+            .theme-emerald {
+                --schedule-bg: #ecfdf5;
+                --schedule-text: #065f46;
+                --schedule-border: #a7f3d0;
+                --schedule-header: #d1fae5;
+                --schedule-time: #059669;
+                --schedule-event-text: #064e3b;
+            }
+        }
+        .event-resize-handle {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            cursor: ns-resize;
+            opacity: 0.3;
+            background: linear-gradient(to right, currentColor, currentColor);
+            background-size: 20px 1px;
+            background-repeat: repeat-x;
+            transition: opacity 0.2s;
+        }
+        .event-resize-handle:hover {
+            opacity: 0.7;
+        }
+        .hour-marker {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: currentColor;
+            opacity: 0.2;
+        }
+        .schedule-day {
+            min-height: 1400px; /* 24 hours with more granularity */
+            color: var(--schedule-text);
+        }
+        .event-item {
+            transition: all 0.15s ease;
+        }
+        .event-item:hover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .dragging {
+            opacity: 0.7;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .resizing {
+            cursor: ns-resize;
+        }
+        .hour-row {
+            @apply py-3 px-4 text-right text-sm opacity-80 relative border-b;
+            border-color: var(--schedule-border);
+        }
+        .day-header {
+            @apply h-16 flex items-center justify-center border-b font-semibold;
+            background-color: var(--schedule-header);
+            border-color: var(--schedule-border);
+            color: var(--schedule-text);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300">
+    <!-- Main App Container -->
+    <div class="min-h-screen flex flex-col">
+        <!-- App Header -->
+        <header class="glass-effect shadow-sm py-4 sticky top-0 z-20">
+            <div class="container mx-auto px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                <div class="mb-4 sm:mb-0">
+                    <h1 class="text-2xl font-bold text-primary-600 dark:text-primary-400 flex items-center">
+                        <i class="far fa-calendar-alt mr-3"></i> Visual Schedule Planner
+                    </h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Plan your day with style and precision</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium">Theme:</span>
+                        <div id="theme-selector" class="flex gap-1 bg-gray-200 dark:bg-gray-700 rounded-full p-1">
+                            <button data-theme="light" class="theme-btn w-7 h-7 rounded-full bg-white text-gray-700 shadow-sm flex items-center justify-center animate-pop">
+                                <i class="fas fa-sun text-sm"></i>
+                            </button>
+                            <button data-theme="dark" class="theme-btn w-7 h-7 rounded-full bg-gray-800 text-gray-200 flex items-center justify-center animate-pop">
+                                <i class="fas fa-moon text-sm"></i>
+                            </button>
+                            <button data-theme="rose" class="theme-btn w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center animate-pop">
+                                <i class="fas fa-heart text-sm"></i>
+                            </button>
+                            <button data-theme="emerald" class="theme-btn w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center animate-pop">
+                                <i class="fas fa-leaf text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium">Font:</span>
+                        <select id="font-selector" class="text-sm py-1 px-3 bg-gray-100 dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 animate-pop">
+                            <option value="sans">Inter (Clean)</option>
+                            <option value="poppins">Poppins (Modern)</option>
+                            <option value="montserrat">Montserrat (Elegant)</option>
+                        </select>
+                    </div>
+                    
+                    <button id="export-btn" class="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-secondary-500 text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity animate-pop">
+                        <i class="far fa-image"></i> Export as Image
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- App Content -->
+        <main class="flex-1 container mx-auto px-4 py-6">
+            <!-- Controls & Event Creation -->
+            <div class="mb-8 p-5 rounded-xl glass-effect shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-plus-circle text-primary-500 mr-2"></i> Create New Schedule Item
+                        </h2>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <div class="flex items-center gap-2">
+                            <span>Title:</span>
+                            <input id="event-title" type="text" placeholder="Meeting, Workout..." class="py-2 px-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span>Day:</span>
+                            <select id="event-day" class="py-2 px-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="mon">Monday</option>
+                                <option value="tue">Tuesday</option>
+                                <option value="wed">Wednesday</option>
+                                <option value="thu">Thursday</option>
+                                <option value="fri">Friday</option>
+                                <option value="sat">Saturday</option>
+                                <option value="sun">Sunday</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span>Start:</span>
+                            <input id="event-start" type="time" class="py-2 px-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span>Duration:</span>
+                            <select id="event-duration" class="py-2 px-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="30">30 min</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                                <option value="180">3 hours</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span>Color:</span>
+                            <div id="color-picker" class="flex gap-1">
+                                <div class="color-option w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#38bdf8" style="background-color: #38bdf8;"></div>
+                                <div class="color-option w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#f59e0b" style="background-color: #f59e0b;"></div>
+                                <div class="color-option w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#10b981" style="background-color: #10b981;"></div>
+                                <div class="color-option w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#f43f5e" style="background-color: #f43f5e;"></div>
+                                <div class="color-option w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#8b5cf6" style="background-color: #8b5cf6;"></div>
+                            </div>
+                        </div>
+                        
+                        <button id="add-event" class="py-2 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors">
+                            Add Activity
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Schedule View -->
+            <div id="schedule-view" class="theme-light bg-[var(--schedule-bg)] border border-[var(--schedule-border)] rounded-xl shadow-lg overflow-hidden">
+                <div class="flex">
+                    <!-- Time Labels Column -->
+                    <div class="w-20 flex-shrink-0 border-r border-[var(--schedule-border)]">
+                        <div class="h-16 border-b border-[var(--schedule-border)] bg-[var(--schedule-header)]"></div>
+                        <div class="relative" style="height: 1400px;">
+                            <div class="absolute top-0 w-full">
+                                <!-- Generate hours from 6 AM to 10 PM -->
+                                <div class="hour-row" data-hour="6">6 AM</div>
+                                <div class="hour-row">7 AM</div>
+                                <div class="hour-row">8 AM</div>
+                                <div class="hour-row">9 AM</div>
+                                <div class="hour-row">10 AM</div>
+                                <div class="hour-row">11 AM</div>
+                                <div class="hour-row" data-hour="12">12 PM</div>
+                                <div class="hour-row">1 PM</div>
+                                <div class="hour-row">2 PM</div>
+                                <div class="hour-row">3 PM</div>
+                                <div class="hour-row">4 PM</div>
+                                <div class="hour-row">5 PM</div>
+                                <div class="hour-row">6 PM</div>
+                                <div class="hour-row">7 PM</div>
+                                <div class="hour-row">8 PM</div>
+                                <div class="hour-row">9 PM</div>
+                                <div class="hour-row">10 PM</div>
+                                
+                                <!-- Hour markers -->
+                                <div class="hour-marker" style="top: 0px;"></div>
+                                <div class="hour-marker" style="top: 60px;"></div>
+                                <div class="hour-marker" style="top: 120px;"></div>
+                                <div class="hour-marker" style="top: 180px;"></div>
+                                <div class="hour-marker" style="top: 240px;"></div>
+                                <div class="hour-marker" style="top: 300px;"></div>
+                                <div class="hour-marker" style="top: 360px;"></div>
+                                <div class="hour-marker" style="top: 420px;"></div>
+                                <div class="hour-marker" style="top: 480px;"></div>
+                                <div class="hour-marker" style="top: 540px;"></div>
+                                <div class="hour-marker" style="top: 600px;"></div>
+                                <div class="hour-marker" style="top: 660px;"></div>
+                                <div class="hour-marker" style="top: 720px;"></div>
+                                <div class="hour-marker" style="top: 780px;"></div>
+                                <div class="hour-marker" style="top: 840px;"></div>
+                                <div class="hour-marker" style="top: 900px;"></div>
+                                <div class="hour-marker" style="top: 960px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Days Columns -->
+                    <div id="schedule-days" class="flex-1 flex overflow-x-auto custom-scrollbar">
+                        <!-- Monday -->
+                        <div class="day-column flex-1 min-w-[180px] border-r border-[var(--schedule-border)] last:border-r-0">
+                            <div class="day-header">
+                                Monday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="mon"></div>
+                        </div>
+                        
+                        <!-- Tuesday -->
+                        <div class="day-column flex-1 min-w-[180px] border-r border-[var(--schedule-border)] last:border-r-0">
+                            <div class="day-header">
+                                Tuesday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="tue"></div>
+                        </div>
+                        
+                        <!-- Wednesday -->
+                        <div class="day-column flex-1 min-w-[180px] border-r border-[var(--schedule-border)] last:border-r-0">
+                            <div class="day-header">
+                                Wednesday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="wed"></div>
+                        </div>
+                        
+                        <!-- Thursday -->
+                        <div class="day-column flex-1 min-w-[180px] border-r border-[var(--schedule-border)] last:border-r-0">
+                            <div class="day-header">
+                                Thursday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="thu"></div>
+                        </div>
+                        
+                        <!-- Friday -->
+                        <div class="day-column flex-1 min-w-[180px] border-r border-[var(--schedule-border)] last:border-r-0">
+                            <div class="day-header">
+                                Friday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="fri"></div>
+                        </div>
+                        
+                        <!-- Saturday -->
+                        <div class="day-column flex-1 min-w-[180px] border-r border-[var(--schedule-border)] last:border-r-0">
+                            <div class="day-header">
+                                Saturday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="sat"></div>
+                        </div>
+                        
+                        <!-- Sunday -->
+                        <div class="day-column flex-1 min-w-[180px] last:border-r-0">
+                            <div class="day-header">
+                                Sunday
+                            </div>
+                            <div class="day-content schedule-day relative" data-day="sun"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="mt-auto glass-effect shadow-sm py-4">
+            <div class="container mx-auto px-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                Created with <i class="fas fa-heart text-rose-500 mx-1"></i> • Visual Schedule Planner • Drag to move, resize to adjust duration
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Export Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Export Your Schedule</h3>
+                <button id="close-export-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-6">
+                <div id="export-preview" class="w-full max-h-[60vh] overflow-auto bg-white rounded-lg">
+                    <!-- Preview content will be generated here -->
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <div>
+                    <span class="text-gray-600 dark:text-gray-300">Image will be generated with your schedule</span>
+                </div>
+                <button id="download-export" class="bg-gradient-to-r from-primary-600 to-secondary-500 text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity animate-pop">
+                    <i class="fas fa-download mr-2"></i> Download Image
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize state
+            const state = {
+                activities: [],
+                selectedTheme: 'light',
+                selectedColor: '#38bdf8',
+                selectedFont: 'sans',
+                isDragging: false,
+                draggingElement: null,
+                isResizing: false,
+                resizingElement: null,
+                startY: 0,
+                startHeight: 0
+            };
+            
+            // DOM elements
+            const elements = {
+                themeSelector: document.getElementById('theme-selector'),
+                scheduleView: document.getElementById('schedule-view'),
+                fontSelector: document.getElementById('font-selector'),
+                eventTitle: document.getElementById('event-title'),
+                eventDay: document.getElementById('event-day'),
+                eventStart: document.getElementById('event-start'),
+                eventDuration: document.getElementById('event-duration'),
+                addEventButton: document.getElementById('add-event'),
+                scheduleDays: document.getElementById('schedule-days'),
+                colorPicker: document.getElementById('color-picker'),
+                exportBtn: document.getElementById('export-btn'),
+                exportModal: document.getElementById('export-modal'),
+                exportPreview: document.getElementById('export-preview'),
+                closeExportModal: document.getElementById('close-export-modal'),
+                downloadExport: document.getElementById('download-export')
+            };
+            
+            // Initialize time input with current time
+            const now = new Date();
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            elements.eventStart.value = currentTime;
+            
+            // Color picker event listeners
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    state.selectedColor = this.dataset.color;
+                    document.querySelectorAll('.color-option').forEach(opt => {
+                        opt.classList.remove('border-2', 'border-primary-500', 'scale-110');
+                    });
+                    this.classList.add('border-2', 'border-primary-500', 'scale-110');
+                });
+            });
+            
+            // Select first color by default
+            document.querySelector('.color-option').click();
+            
+            // Theme switching
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    state.selectedTheme = theme;
+                    elements.scheduleView.className = `theme-${theme}`;
+                    
+                    document.querySelectorAll('.theme-btn').forEach(b => {
+                        b.classList.remove('ring-2', 'ring-primary-500', 'ring-opacity-70', 'scale-110');
+                    });
+                    this.classList.add('ring-2', 'ring-primary-500', 'ring-opacity-70', 'scale-110');
+                });
+            });
+            
+            // Font switching
+            elements.fontSelector.addEventListener('change', function() {
+                const font = this.value;
+                state.selectedFont = font;
+                document.body.classList.remove('font-sans', 'font-poppins', 'font-montserrat');
+                if (font === 'sans') {
+                    document.body.classList.add('font-sans');
+                } else if (font === 'poppins') {
+                    document.body.classList.add('font-poppins');
+                } else if (font === 'montserrat') {
+                    document.body.classList.add('font-montserrat');
+                }
+            });
+            
+            // Add example activities
+            function initializeExampleActivities() {
+                const now = new Date();
+                const currentHour = now.getHours();
+                
+                const examples = [
+                    { id: Date.now() + 1, title: 'Morning Meeting', day: 'mon', start: '9:00', duration: 60, color: '#38bdf8' },
+                    { id: Date.now() + 2, title: 'Gym Workout', day: 'mon', start: '7:00', duration: 90, color: '#f43f5e' },
+                    { id: Date.now() + 3, title: 'Lunch Break', day: 'tue', start: '12:30', duration: 60, color: '#10b981' },
+                    { id: Date.now() + 4, title: 'Project Deadline', day: 'wed', start: '14:00', duration: 120, color: '#f59e0b' },
+                    { id: Date.now() + 5, title: 'Team Standup', day: 'thu', start: '10:00', duration: 30, color: '#8b5cf6' },
+                    { id: Date.now() + 6, title: 'Dinner with Friends', day: 'fri', start: '19:30', duration: 120, color: '#ec4899' },
+                    { id: Date.now() + 7, title: currentHour >= 15 ? 'Evening Relaxation' : 'Strategy Session', day: 'fri', start: '16:00', duration: 60, color: currentHour >= 15 ? '#14b8a6' : '#a855f7' }
+                ];
+                
+                state.activities = examples;
+                renderActivities();
+            }
+            
+            // Create event elements for schedule
+            function renderActivities() {
+                // Clear existing activities
+                document.querySelectorAll('.event-item').forEach(el => el.remove());
+                
+                // Loop through all activities
+                state.activities.forEach(activity => {
+                    const dayElement = document.querySelector(`.day-content[data-day="${activity.day}"]`);
+                    
+                    // Calculate positioning (each hour = 60px, 60 min = 60px)
+                    const [hours, minutes] = activity.start.split(':').map(Number);
+                    const timeInMinutes = hours * 60 + minutes;
+                    
+                    // Subtract 360 minutes (6 hours) because schedule starts at 6 AM
+                    const topPosition = (timeInMinutes - 360) * 1;
+                    
+                    // Duration = height in pixels
+                    const height = activity.duration * 1;
+                    
+                    // Create event element
+                    const eventElement = document.createElement('div');
+                    eventElement.className = `event-item absolute inset-x-2 p-3 rounded-lg shadow-sm overflow-hidden cursor-move event-item-${activity.id}`;
+                    eventElement.style.top = `${topPosition}px`;
+                    eventElement.style.height = `${height}px`;
+                    eventElement.style.backgroundColor = `${activity.color}20`;
+                    eventElement.style.borderLeft = `4px solid ${activity.color}`;
+                    eventElement.style.color = getTextColor(activity.color);
+                    eventElement.dataset.id = activity.id;
+                    eventElement.dataset.start = activity.start;
+                    eventElement.dataset.duration = activity.duration;
+                    eventElement.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold truncate">${activity.title}</h3>
+                                <p class="text-xs opacity-80 mt-1">${formatTime(activity.start)} - ${formatTime(addMinutes(activity.start, activity.duration))}</p>
+                            </div>
+                            <button class="delete-btn text-gray-500 hover:text-red-500">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="event-resize-handle"></div>
+                    `;
+                    
+                    // Add delete event listener
+                    eventElement.querySelector('.delete-btn').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = parseInt(eventElement.dataset.id);
+                        state.activities = state.activities.filter(a => a.id !== id);
+                        eventElement.remove();
+                    });
+                    
+                    // Add drag events
+                    eventElement.addEventListener('mousedown', startDrag);
+                    
+                    // Add resize handler
+                    const resizeHandle = eventElement.querySelector('.event-resize-handle');
+                    resizeHandle.addEventListener('mousedown', startResize);
+                    
+                    dayElement.appendChild(eventElement);
+                });
+            }
+            
+            // Helper function to calculate text color based on background
+            function getTextColor(hexColor) {
+                const r = parseInt(hexColor.substr(1, 2), 16);
+                const g = parseInt(hexColor.substr(3, 2), 16);
+                const b = parseInt(hexColor.substr(5, 2), 16);
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                return brightness > 150 ? '#1f2937' : '#f9fafb';
+            }
+            
+            // Format time as HH:MM AM/PM
+            function formatTime(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                const period = hours >= 12 ? 'PM' : 'AM';
+                const displayHours = hours % 12 || 12;
+                return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+            }
+            
+            // Add minutes to a time string
+            function addMinutes(timeStr, minutes) {
+                const [hours, mins] = timeStr.split(':').map(Number);
+                const totalMinutes = hours * 60 + mins + minutes;
+                const newHours = Math.floor(totalMinutes / 60) % 24;
+                const newMinutes = totalMinutes % 60;
+                return `${newHours}:${newMinutes.toString().padStart(2, '0')}`;
+            }
+            
+            // Add new event to schedule
+            elements.addEventButton.addEventListener('click', function() {
+                const title = elements.eventTitle.value.trim();
+                const day = elements.eventDay.value;
+                const start = elements.eventStart.value;
+                const duration = parseInt(elements.eventDuration.value);
+                
+                if (!title) {
+                    showError('Please enter a title for the activity');
+                    return;
+                }
+                
+                const newActivity = {
+                    id: Date.now(),
+                    title,
+                    day,
+                    start,
+                    duration,
+                    color: state.selectedColor
+                };
+                
+                state.activities.push(newActivity);
+                renderActivities();
+                
+                // Reset form
+                elements.eventTitle.value = '';
+                elements.eventTitle.focus();
+                
+                // Show confirmation
+                showSuccess('Activity added to your schedule!');
+            });
+            
+            // Show error message
+            function showError(message) {
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 z-50 flex items-center p-4 text-red-800 bg-red-100 rounded-lg shadow-lg animate-pop';
+                toast.innerHTML = `
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span class="font-medium">${message}</span>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+            
+            // Show success message
+            function showSuccess(message) {
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 z-50 flex items-center p-4 text-green-800 bg-green-100 rounded-lg shadow-lg animate-pop';
+                toast.innerHTML = `
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span class="font-medium">${message}</span>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+            
+            // Drag & Drop Functions
+            function startDrag(e) {
+                // Ignore clicks on the delete button
+                if (e.target.closest('button') || e.target.classList.contains('event-resize-handle')) {
+                    return;
+                }
+                
+                state.isDragging = true;
+                state.draggingElement = this;
+                
+                this.classList.add('dragging', 'shadow-lg', 'opacity-80', 'z-10');
+                
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', stopDrag);
+            }
+            
+            function handleDrag(e) {
+                if (!state.isDragging) return;
+                
+                const draggingRect = state.draggingElement.getBoundingClientRect();
+                const container = state.draggingElement.closest('.schedule-day');
+                const containerRect = container.getBoundingClientRect();
+                
+                // Calculate new top position relative to container
+                let newTop = e.clientY - containerRect.top - (draggingRect.height / 2);
+                
+                // Constrain to within container boundaries
+                newTop = Math.max(0, newTop);
+                newTop = Math.min(newTop, containerRect.height - draggingRect.height);
+                
+                state.draggingElement.style.top = `${newTop}px`;
+            }
+            
+            function stopDrag() {
+                if (!state.isDragging) return;
+                
+                state.isDragging = false;
+                state.draggingElement.classList.remove('dragging', 'shadow-lg', 'opacity-80', 'z-10');
+                state.draggingElement = null;
+                
+                document.removeEventListener('mousemove', handleDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                
+                // Update the activity data model (optional)
+            }
+            
+            // Event Resizing Functions
+            function startResize(e) {
+                e.stopPropagation();
+                
+                state.isResizing = true;
+                state.resizingElement = this.parentElement;
+                state.startY = e.clientY;
+                state.startHeight = parseInt(state.resizingElement.style.height);
+                
+                state.resizingElement.classList.add('resizing');
+                
+                document.addEventListener('mousemove', handleResize);
+                document.addEventListener('mouseup', stopResize);
+            }
+            
+            function handleResize(e) {
+                if (!state.isResizing) return;
+                
+                const container = state.resizingElement.closest('.schedule-day');
+                const containerRect = container.getBoundingClientRect();
+                const eventRect = state.resizingElement.getBoundingClientRect();
+                
+                const movementY = e.clientY - state.startY;
+                let newHeight = state.startHeight + movementY;
+                
+                // Minimum height constraint
+                newHeight = Math.max(newHeight, 30);
+                
+                // Maximum height constraint (bottom of container)
+                const maxHeight = containerRect.height - eventRect.top + container.scrollTop;
+                newHeight = Math.min(newHeight, maxHeight);
+                
+                state.resizingElement.style.height = `${newHeight}px`;
+            }
+            
+            function stopResize() {
+                if (!state.isResizing) return;
+                
+                state.isResizing = false;
+                state.resizingElement.classList.remove('resizing');
+                state.resizingElement = null;
+                
+                document.removeEventListener('mousemove', handleResize);
+                document.removeEventListener('mouseup', stopResize);
+                
+                // Update the activity data model (optional)
+            }
+            
+            // Export to Image
+            elements.exportBtn.addEventListener('click', function() {
+                // Create a preview clone
+                const scheduleClone = elements.scheduleView.cloneNode(true);
+                scheduleClone.classList.add('w-full', 'max-w-4xl', 'mx-auto', 'shadow-none');
+                scheduleClone.id = '';
+                
+                // Remove buttons and interactive elements from clone
+                scheduleClone.querySelectorAll('button').forEach(btn => btn.remove());
+                scheduleClone.querySelectorAll('.event-resize-handle').forEach(el => el.remove());
+                scheduleClone.querySelectorAll('.event-item').forEach(el => {
+                    el.style.cursor = 'default';
+                });
+                
+                // Clear preview and append the clone
+                elements.exportPreview.innerHTML = '';
+                elements.exportPreview.appendChild(scheduleClone);
+                
+                // Show modal
+                elements.exportModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Close export modal
+            elements.closeExportModal.addEventListener('click', function() {
+                elements.exportModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Download exported image
+            elements.downloadExport.addEventListener('click', function() {
+                html2canvas(elements.exportPreview.firstChild, {
+                    scale: 2,
+                    backgroundColor: null,
+                    logging: false,
+                    useCORS: true
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'schedule-export.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    // Close modal
+                    elements.exportModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+            
+            // Initialize with example activities
+            initializeExampleActivities();
+            
+            // Apply initial theme style
+            document.querySelector('.theme-btn').click();
+        });
+    </script>
+</body>
+</html>

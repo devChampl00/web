@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Background Remover Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dropzone {
+            border: 2px dashed #3b82f6;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone.active {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .dropzone.error {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        .image-container {
+            position: relative;
+            max-width: 100%;
+            max-height: 400px;
+            overflow: hidden;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background-color: #e5e7eb;
+            position: relative;
+            overflow: hidden;
+            border-radius: 9999px;
+        }
+
+        .progress-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+            border-radius: 9999px;
+        }
+
+        .result-container {
+            display: none;
+        }
+
+        .download-btn {
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .processing-animation {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+
+        .processing-animation div {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            animation: processing 1.2s linear infinite;
+        }
+
+        .processing-animation div:nth-child(1) {
+            top: 8px;
+            left: 8px;
+            animation-delay: 0s;
+        }
+
+        .processing-animation div:nth-child(2) {
+            top: 8px;
+            left: 32px;
+            animation-delay: -0.4s;
+        }
+
+        .processing-animation div:nth-child(3) {
+            top: 8px;
+            left: 56px;
+            animation-delay: -0.8s;
+        }
+
+        @keyframes processing {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(0.5);
+                opacity: 0.5;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast.success .toast-icon {
+            color: #10b981;
+        }
+
+        .toast.error .toast-icon {
+            color: #ef4444;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .image-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .image-option-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .image-option-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .image-option-btn:not(.active) {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .image-option-btn:not(.active):hover {
+            background-color: #e5e7eb;
+        }
+
+        .quality-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quality-option {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .quality-radio {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .quality-radio:checked {
+            border-color: #3b82f6;
+        }
+
+        .quality-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <h1 class="text-2xl font-bold">Advanced Background Remover</h1>
+                        <p class="text-purple-200 mt-1">Remove backgrounds from images with precision</p>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
+                        <i class="fas fa-magic"></i>
+                        <span>AI Powered</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="p-6">
+                <div id="upload-section">
+                    <div id="dropzone" class="dropzone rounded-xl p-8 text-center cursor-pointer mb-6">
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">Drag & Drop your image here</h3>
+                            <p class="text-gray-500 mb-4">or click to browse files</p>
+                            <input type="file" id="file-input" class="hidden" accept="image/*">
+                            <button id="select-file-btn"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition flex items-center gap-2">
+                                <i class="fas fa-folder-open"></i>
+                                Select Image
+                            </button>
+                            <p class="text-sm text-gray-400 mt-4">Supports JPG, PNG, WEBP (Max 10MB)</p>
+                        </div>
+                    </div>
+
+                    <div id="preview-section" class="hidden">
+                        <div class="flex flex-col md:flex-row gap-6 mb-6">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-medium text-gray-700 mb-3">Original Image</h3>
+                                <div
+                                    class="image-container bg-gray-100 rounded-lg flex items-center justify-center p-4">
+                                    <img id="original-image" class="image-preview" src="" alt="Original image">
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-medium text-gray-700 mb-3">Result</h3>
+                                <div id="result-container"
+                                    class="result-container image-container bg-gray-100 rounded-lg flex items-center justify-center p-4">
+                                    <div id="processing" class="text-center">
+                                        <div class="processing-animation">
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                        </div>
+                                        <p class="text-gray-600 mt-4">Removing background...</p>
+                                        <p class="text-sm text-gray-400 mt-2">This may take a few seconds</p>
+                                    </div>
+                                    <img id="result-image" class="image-preview hidden" src="" alt="Result image">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Options -->
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <h4 class="font-medium text-gray-700 mb-3">Output Options</h4>
+
+                            <div class="image-options">
+                                <button id="option-transparent" class="image-option-btn active">
+                                    Transparent
+                                </button>
+                                <button id="option-white" class="image-option-btn">
+                                    White
+                                </button>
+                                <button id="option-black" class="image-option-btn">
+                                    Black
+                                </button>
+                                <button id="option-blur" class="image-option-btn">
+                                    Blur
+                                </button>
+                            </div>
+
+                            <div class="quality-selector">
+                                <span class="text-sm text-gray-600">Quality:</span>
+                                <label class="quality-option">
+                                    <input type="radio" name="quality" class="quality-radio" value="high" checked>
+                                    <span class="text-sm">High</span>
+                                </label>
+                                <label class="quality-option">
+                                    <input type="radio" name="quality" class="quality-radio" value="medium">
+                                    <span class="text-sm">Medium</span>
+                                </label>
+                                <label class="quality-option">
+                                    <input type="radio" name="quality" class="quality-radio" value="low">
+                                    <span class="text-sm">Low</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="progress-bar rounded-full mb-4">
+                            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center space-x-2 text-gray-500">
+                                <i class="fas fa-info-circle"></i>
+                                <span id="status-message">Ready to process</span>
+                            </div>
+                            <div class="flex space-x-3">
+                                <button id="cancel-btn"
+                                    class="text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg border border-gray-300 transition flex items-center gap-2">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                                <button id="process-btn"
+                                    class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition flex items-center gap-2">
+                                    <i class="fas fa-magic"></i>
+                                    Remove Background
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="download-section" class="hidden mt-8">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                        <div class="flex justify-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-check-circle text-green-600 text-3xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Background removed successfully!</h3>
+                        <p class="text-gray-600 mb-6">Your image is ready to download</p>
+
+                        <div class="flex flex-col sm:flex-row justify-center gap-4">
+                            <button id="download-png-btn"
+                                class="download-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-download"></i>
+                                Download PNG
+                            </button>
+                            <button id="download-jpg-btn"
+                                class="download-btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-download"></i>
+                                Download JPG
+                            </button>
+                            <button id="new-image-btn"
+                                class="download-btn bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-redo"></i>
+                                New Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-medium text-gray-700 mb-3">Tips for best results:</h4>
+                        <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                <span>Use high contrast between subject and background</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                <span>Ensure good lighting on your subject</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                <span>Avoid complex backgrounds with similar colors to subject</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                <span>For portraits, position subject clearly in the frame</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-gray-50 p-4 text-center text-sm text-gray-500">
+                <p>Powered by AI technology. Processing done in the cloud.</p>
+                <p class="mt-1">Note: This demo uses a simulated API. For real background removal, sign up at <a
+                        href="https://www.remove.bg/" target="_blank"
+                        class="text-blue-500 hover:underline">remove.bg</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM Elements
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('file-input');
+            const selectFileBtn = document.getElementById('select-file-btn');
+            const previewSection = document.getElementById('preview-section');
+            const originalImage = document.getElementById('original-image');
+            const resultContainer = document.getElementById('result-container');
+            const resultImage = document.getElementById('result-image');
+            const processingElement = document.getElementById('processing');
+            const processBtn = document.getElementById('process-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const statusMessage = document.getElementById('status-message');
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const downloadSection = document.getElementById('download-section');
+            const downloadPngBtn = document.getElementById('download-png-btn');
+            const downloadJpgBtn = document.getElementById('download-jpg-btn');
+            const newImageBtn = document.getElementById('new-image-btn');
+            const uploadSection = document.getElementById('upload-section');
+            const toastContainer = document.getElementById('toast-container');
+
+            // Image options
+            const optionTransparent = document.getElementById('option-transparent');
+            const optionWhite = document.getElementById('option-white');
+            const optionBlack = document.getElementById('option-black');
+            const optionBlur = document.getElementById('option-blur');
+
+            // Variables
+            let selectedFile = null;
+            let processing = false;
+            let resultBlob = null;
+            let currentBackgroundOption = 'transparent';
+            let currentQuality = 'high';
+
+            // Event Listeners
+            selectFileBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+            dropzone.addEventListener('dragover', handleDragOver);
+            dropzone.addEventListener('dragleave', handleDragLeave);
+            dropzone.addEventListener('drop', handleDrop);
+            processBtn.addEventListener('click', processImage);
+            cancelBtn.addEventListener('click', resetApp);
+            downloadPngBtn.addEventListener('click', () => downloadImage('png'));
+            downloadJpgBtn.addEventListener('click', () => downloadImage('jpg'));
+            newImageBtn.addEventListener('click', resetApp);
+
+            // Image option listeners
+            optionTransparent.addEventListener('click', () => setBackgroundOption('transparent'));
+            optionWhite.addEventListener('click', () => setBackgroundOption('white'));
+            optionBlack.addEventListener('click', () => setBackgroundOption('black'));
+            optionBlur.addEventListener('click', () => setBackgroundOption('blur'));
+
+            // Quality option listeners
+            document.querySelectorAll('input[name="quality"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    currentQuality = this.value;
+                });
+            });
+
+            // Functions
+            function handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    validateAndLoadFile(file);
+                }
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                dropzone.classList.add('active');
+            }
+
+            function handleDragLeave() {
+                dropzone.classList.remove('active');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                dropzone.classList.remove('active');
+
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    validateAndLoadFile(file);
+                }
+            }
+
+            function validateAndLoadFile(file) {
+                // Check file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    showError('Invalid file type', 'Please select a JPG, PNG, or WEBP image file.');
+                    return;
+                }
+
+                // Check file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    showError('File too large', 'Maximum file size is 10MB. Please select a smaller image.');
+                    return;
+                }
+
+                selectedFile = file;
+                loadPreview(file);
+                showSuccess('Image loaded', 'Your image is ready for background removal!');
+            }
+
+            function loadPreview(file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    originalImage.src = e.target.result;
+                    previewSection.classList.remove('hidden');
+                    uploadSection.classList.add('hidden');
+                    statusMessage.textContent = 'Ready to process';
+                    progressBarFill.style.width = '0%';
+
+                    // Scroll to preview section
+                    previewSection.scrollIntoView({ behavior: 'smooth' });
+                };
+
+                reader.onerror = function () {
+                    showError('Loading failed', 'Could not load the image. Please try another file.');
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            function setBackgroundOption(option) {
+                currentBackgroundOption = option;
+
+                // Update active button
+                [optionTransparent, optionWhite, optionBlack, optionBlur].forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                switch (option) {
+                    case 'transparent':
+                        optionTransparent.classList.add('active');
+                        break;
+                    case 'white':
+                        optionWhite.classList.add('active');
+                        break;
+                    case 'black':
+                        optionBlack.classList.add('active');
+                        break;
+                    case 'blur':
+                        optionBlur.classList.add('active');
+                        break;
+                }
+
+                // If we already have a result, update it with the new background
+                if (resultImage.src && !processing) {
+                    updateResultWithBackground(originalImage.src, currentBackgroundOption)
+                        .then(newImage => {
+                            resultImage.src = newImage;
+                            fetch(newImage)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                    resultBlob = blob;
+                                });
+                        });
+                }
+            }
+
+            function processImage() {
+                if (!selectedFile || processing) return;
+
+                processing = true;
+                processBtn.disabled = true;
+                processBtn.innerHTML = '<div class="spinner"></div> Processing...';
+                statusMessage.textContent = 'Processing image...';
+                resultContainer.classList.remove('hidden');
+                processingElement.classList.remove('hidden');
+                resultImage.classList.add('hidden');
+
+                // Simulate progress (in a real app, this would be API call progress)
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress > 90) progress = 90; // Don't go to 100% until "API" completes
+                    progressBarFill.style.width = `${progress}%`;
+                }, 300);
+
+                // Simulate API call with setTimeout
+                setTimeout(() => {
+                    clearInterval(progressInterval);
+                    progressBarFill.style.width = '100%';
+
+                    // In a real app, you would call the Remove.bg API here
+                    // For demo purposes, we'll just use a modified version of the original
+                    updateResultWithBackground(originalImage.src, currentBackgroundOption)
+                        .then(processedImage => {
+                            resultImage.src = processedImage;
+                            resultImage.classList.remove('hidden');
+                            processingElement.classList.add('hidden');
+                            statusMessage.textContent = 'Processing complete!';
+                            processing = false;
+                            processBtn.disabled = false;
+                            processBtn.innerHTML = '<i class="fas fa-magic"></i> Remove Background';
+
+                            // Convert data URL to blob for download
+                            fetch(processedImage)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                    resultBlob = blob;
+                                    showDownloadSection();
+                                    showSuccess('Background removed', 'Your image is ready to download!');
+                                })
+                                .catch(err => {
+                                    showError('Download failed', 'Could not prepare image for download. Please try again.');
+                                });
+                        })
+                        .catch(err => {
+                            showError('Processing failed', 'Could not remove the background. Please try again.');
+                            processing = false;
+                            processBtn.disabled = false;
+                            processBtn.innerHTML = '<i class="fas fa-magic"></i> Remove Background';
+                            progressBarFill.style.width = '0%';
+                        });
+                }, 3000);
+            }
+
+            function updateResultWithBackground(src, backgroundOption) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        const img = new Image();
+                        img.onload = function () {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+
+                            // Get image data
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+
+                            // Apply different background effects based on option
+                            switch (backgroundOption) {
+                                case 'transparent':
+                                    // Make background semi-transparent (simplified for demo)
+                                    for (let i = 0; i < data.length; i += 4) {
+                                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                                        if (avg > 200) { // Light pixels (likely background)
+                                            data[i + 3] = 0; // Make transparent
+                                        }
+                                    }
+                                    break;
+                                case 'white':
+                                    // Fill background with white
+                                    ctx.fillStyle = 'white';
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 0, 0);
+                                    break;
+                                case 'black':
+                                    // Fill background with black
+                                    ctx.fillStyle = 'black';
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 0, 0);
+                                    break;
+                                case 'blur':
+                                    // Create blurred background
+                                    ctx.filter = 'blur(8px)';
+                                    ctx.drawImage(img, 0, 0);
+                                    ctx.filter = 'none';
+
+                                    // Draw original image on top
+                                    const tempCanvas = document.createElement('canvas');
+                                    tempCanvas.width = img.width;
+                                    tempCanvas.height = img.height;
+                                    const tempCtx = tempCanvas.getContext('2d');
+                                    tempCtx.drawImage(img, 0, 0);
+
+                                    // Make background semi-transparent
+                                    const tempData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
+                                    for (let i = 0; i < tempData.length; i += 4) {
+                                        const avg = (tempData[i] + tempData[i + 1] + tempData[i + 2]) / 3;
+                                        if (avg > 200) { // Light pixels (likely background)
+                                            tempData[i + 3] = 0; // Make transparent
+                                        }
+                                    }
+
+                                    ctx.drawImage(tempCanvas, 0, 0);
+                                    break;
+                            }
+
+                            ctx.putImageData(imageData, 0, 0);
+
+                            // Adjust quality based on selection
+                            let quality = 1.0;
+                            switch (currentQuality) {
+                                case 'high':
+                                    quality = 1.0;
+                                    break;
+                                case 'medium':
+                                    quality = 0.7;
+                                    break;
+                                case 'low':
+                                    quality = 0.5;
+                                    break;
+                            }
+
+                            resolve(canvas.toDataURL('image/png', quality));
+                        };
+                        img.onerror = function () {
+                            reject(new Error('Could not load image'));
+                        };
+                        img.src = src;
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            }
+
+            function showDownloadSection() {
+                previewSection.classList.add('hidden');
+                downloadSection.classList.remove('hidden');
+
+                // Scroll to download section
+                downloadSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function downloadImage(format) {
+                if (!resultBlob) {
+                    showError('Download failed', 'No image available to download. Please process the image first.');
+                    return;
+                }
+
+                const a = document.createElement('a');
+                let blob = resultBlob;
+                let extension = 'png';
+
+                if (format === 'jpg') {
+                    // Convert PNG to JPG
+                    const canvas = document.createElement('canvas');
+                    const img = new Image();
+                    img.onload = function () {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = 'white'; // JPG doesn't support transparency
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+
+                        const jpgUrl = canvas.toDataURL('image/jpeg', 0.9);
+                        a.href = jpgUrl;
+                        a.download = `background-removed.${extension}`;
+                        a.click();
+                        showSuccess('Download started', 'Your image is being downloaded as JPG.');
+                    };
+                    img.onerror = function () {
+                        showError('Conversion failed', 'Could not convert image to JPG format.');
+                    };
+                    img.src = URL.createObjectURL(resultBlob);
+                    extension = 'jpg';
+                    return;
+                }
+
+                // For PNG
+                a.href = URL.createObjectURL(blob);
+                a.download = `background-removed.${extension}`;
+                a.click();
+                showSuccess('Download started', 'Your image is being downloaded as PNG.');
+            }
+
+            function resetApp() {
+                selectedFile = null;
+                processing = false;
+                resultBlob = null;
+                currentBackgroundOption = 'transparent';
+
+                // Reset UI elements
+                fileInput.value = '';
+                originalImage.src = '';
+                resultImage.src = '';
+                progressBarFill.style.width = '0%';
+                statusMessage.textContent = 'Ready to process';
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<i class="fas fa-magic"></i> Remove Background';
+
+                // Reset background options
+                [optionTransparent, optionWhite, optionBlack, optionBlur].forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                optionTransparent.classList.add('active');
+
+                // Reset quality options
+                document.querySelector('input[name="quality"][value="high"]').checked = true;
+
+                previewSection.classList.add('hidden');
+                downloadSection.classList.add('hidden');
+                uploadSection.classList.remove('hidden');
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Toast notification functions
+            function showToast(type, title, message) {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+
+                const closeBtn = toast.querySelector('.toast-close');
+                closeBtn.addEventListener('click', () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                });
+
+                toastContainer.appendChild(toast);
+
+                // Show toast after a small delay to allow for animation
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000);
+            }
+
+            function showSuccess(title, message) {
+                showToast('success', title, message);
+            }
+
+            function showError(title, message) {
+                showToast('error', title, message);
+            }
+        });
+    </script>
+</body>
+
+</html>

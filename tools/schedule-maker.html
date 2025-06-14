@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScheduleMaster - Buat & Kelola Jadwal Anda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        'neutral': {
+                            50: '#fafafa',
+                            100: '#f5f5f5',
+                            200: '#e5e5e5',
+                            300: '#d4d4d4',
+                            400: '#a3a3a3',
+                            500: '#737373',
+                            600: '#525252',
+                            700: '#404040',
+                            800: '#262626',
+                            900: '#171717',
+                        },
+                        'success': {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        'danger': {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        'warning': {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary-color: #0ea5e9;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+
+        .dark-mode {
+            --primary-color: #38bdf8;
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .hour-row {
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            min-height: 60px;
+            transition: background-color 0.2s;
+        }
+
+        .hour-row:hover {
+            background-color: rgba(var(--primary-color), 0.05);
+        }
+
+        .event-card {
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .theme-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid-drag-over {
+            background-color: rgba(var(--primary-color), 0.1);
+            border: 2px dashed var(--primary-color);
+        }
+
+        .day-header {
+            position: sticky;
+            top: 64px;
+            z-index: 20;
+        }
+
+        .scroll-area {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(var(--primary-color), 0.5) transparent;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb {
+            background-color: rgba(var(--primary-color), 0.5);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-sm px-4 py-3 border-b border-gray-200 dark:border-gray-700 transition-colors">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center">
+                <h1 class="text-xl font-bold text-primary-700 dark:text-primary-400 flex items-center">
+                    <i class="fa-regular fa-calendar text-primary-600 dark:text-primary-400 mr-2"></i>
+                    ScheduleMaster
+                </h1>
+                <div class="ml-8 flex space-x-2">
+                    <button id="dailyBtn" class="px-3 py-1.5 rounded-lg bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 font-medium transition-colors">
+                        Harian
+                    </button>
+                    <button id="weeklyBtn" class="px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium transition-colors">
+                        Mingguan
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button id="themeBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-moon text-gray-600 dark:text-gray-300"></i>
+                </button>
+                
+                <div class="relative">
+                    <button id="settingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fa-solid fa-gear text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                </div>
+                
+                <button id="exportBtn" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg text-white font-medium flex items-center transition-colors">
+                    <i class="fa-solid fa-download mr-2"></i> Export Jadwal
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Schedule Header -->
+        <div class="mb-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="prevWeekBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-chevron-left text-gray-600 dark:text-gray-300"></i>
+                </button>
+                <h2 id="dateDisplay" class="mx-4 text-lg font-semibold text-gray-800 dark:text-gray-200">Senin, 27 November 2023 - Minggu, 3 Desember 2023</h2>
+                <button id="nextWeekBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-chevron-right text-gray-600 dark:text-gray-300"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <button class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fa-solid fa-list text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                    <button class="p-1.5 rounded-lg bg-white dark:bg-gray-600 shadow">
+                        <i class="fa-solid fa-grid-2 text-primary-600 dark:text-primary-400"></i>
+                    </button>
+                </div>
+                
+                <div class="relative">
+                    <button id="fontBtn" class="px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                        <i class="fa-solid fa-font mr-2 text-gray-600 dark:text-gray-300"></i>
+                        <span>Poppins</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Schedule Grid -->
+        <div id="scheduleGrid" class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+            <!-- Grid header - Days -->
+            <div class="grid grid-cols-8 gap-px bg-gray-200 dark:bg-gray-700">
+                <div class="bg-gray-100 dark:bg-gray-800 py-3 flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fa-regular fa-clock mr-1"></i> Jam
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Senin
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Selasa
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Rabu
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Kamis
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Jumat
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Sabtu
+                </div>
+                <div class="day-header bg-gray-50 dark:bg-gray-800 py-3 text-center font-medium">
+                    Minggu
+                </div>
+            </div>
+            
+            <!-- Grid body - Times -->
+            <div id="timeGrid" class="h-[70vh] overflow-y-auto scroll-area">
+                <!-- Each row represents an hour -->
+                <!-- Filled with JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Add Event Button -->
+        <div class="fixed bottom-6 right-6">
+            <button id="addEventBtn" class="w-14 h-14 rounded-full bg-primary-600 hover:bg-primary-700 flex items-center justify-center shadow-lg transition-all hover:shadow-xl text-white text-2xl">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+    </main>
+    
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="fixed top-0 right-0 w-full max-w-xs h-full bg-white dark:bg-gray-800 shadow-2xl translate-x-full z-50 overflow-y-auto slide-in hidden">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Pengaturan Jadwal</h3>
+                <button id="closeSettingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-xmark text-gray-500 dark:text-gray-300"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <h4 class="font-medium mb-4">Tema Warna</h4>
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="theme-card h-20 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 cursor-pointer border-2 border-blue-400 flex items-center justify-center text-white">
+                    <span>Ocean</span>
+                </div>
+                <div class="theme-card h-20 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 cursor-pointer border-2 border-transparent hover:border-emerald-400 flex items-center justify-center text-white">
+                    <span>Forest</span>
+                </div>
+                <div class="theme-card h-20 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 cursor-pointer border-2 border-transparent hover:border-amber-400 flex items-center justify-center text-white">
+                    <span>Sunset</span>
+                </div>
+                <div class="theme-card h-20 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 cursor-pointer border-2 border-transparent hover:border-rose-400 flex items-center justify-center text-white">
+                    <span>Blossom</span>
+                </div>
+                <div class="theme-card h-20 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 cursor-pointer border-2 border-transparent hover:border-purple-400 flex items-center justify-center text-white">
+                    <span>Violet</span>
+                </div>
+                <div class="theme-card h-20 rounded-xl bg-gradient-to-br from-gray-500 to-gray-700 cursor-pointer border-2 border-transparent hover:border-gray-400 flex items-center justify-center text-white">
+                    <span>Slate</span>
+                </div>
+            </div>
+            
+            <h4 class="font-medium mb-4">Kustomisasi Font</h4>
+            <div class="space-y-3 mb-6">
+                <div class="font-selector p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750" data-font="Poppins">
+                    <p class="font-poppins text-lg">Poppins - Modern & Bersahabat</p>
+                    <p class="text-sm text-gray-500">AaBbCc</p>
+                </div>
+                <div class="font-selector p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750" data-font="Montserrat">
+                    <p class="font-montserrat text-lg">Montserrat - Elegan & Professional</p>
+                    <p class="text-sm text-gray-500">AaBbCc</p>
+                </div>
+                <div class="font-selector p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750" data-font="Inter">
+                    <p class="font-inter text-lg">Inter - Sangat Mudah Dibaca</p>
+                    <p class="text-sm text-gray-500">AaBbCc</p>
+                </div>
+            </div>
+            
+            <h4 class="font-medium mb-4">Pengaturan Lanjutan</h4>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span>Tampilkan Akhir Pekan</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Jam 24 Jam</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Notifikasi</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Event Modal -->
+    <div id="eventModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md mx-4 overflow-hidden fade-in">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold">Tambah Kegiatan</h3>
+            </div>
+            
+            <div class="p-5">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">Nama Kegiatan</label>
+                    <input type="text" id="eventTitle" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-750" placeholder="Meeting, Gym, Belajar...">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Hari</label>
+                        <select id="eventDay" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-750">
+                            <option value="0">Senin</option>
+                            <option value="1">Selasa</option>
+                            <option value="2">Rabu</option>
+                            <option value="3">Kamis</option>
+                            <option value="4">Jumat</option>
+                            <option value="5">Sabtu</option>
+                            <option value="6">Minggu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Warna</label>
+                        <div class="flex space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer border-2 border-blue-600 color-choice" data-color="#3b82f6"></div>
+                            <div class="w-8 h-8 rounded-full bg-emerald-500 cursor-pointer border-2 border-transparent hover:border-emerald-600 color-choice" data-color="#10b981"></div>
+                            <div class="w-8 h-8 rounded-full bg-amber-500 cursor-pointer border-2 border-transparent hover:border-amber-600 color-choice" data-color="#f59e0b"></div>
+                            <div class="w-8 h-8 rounded-full bg-rose-500 cursor-pointer border-2 border-transparent hover:border-rose-600 color-choice" data-color="#f43f5e"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Mulai</label>
+                        <input type="time" id="eventStart" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-750" value="09:00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Selesai</label>
+                        <input type="time" id="eventEnd" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-750" value="10:00">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">Catatan (opsional)</label>
+                    <textarea id="eventNotes" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-750" rows="2" placeholder="Tambahkan detail..."></textarea>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+                <button id="cancelEventBtn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Batal</button>
+                <button id="saveEventBtn" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg text-white font-medium transition-colors">Simpan Kegiatan</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export Modal -->
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md mx-4 overflow-hidden fade-in">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold">Ekspor Jadwal</h3>
+            </div>
+            
+            <div class="p-5">
+                <div class="mb-4 text-center">
+                    <i class="fa-regular fa-image text-4xl text-primary-500 mb-3"></i>
+                    <p class="mb-4">Anda dapat mengekspor jadwal sebagai gambar untuk dicetak atau dibagikan.</p>
+                    <div class="flex justify-center mb-6">
+                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-40 h-24 flex items-center justify-center">
+                            <span class="text-gray-500">Pratinjau</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button id="exportPNGBtn" class="py-3 bg-primary-600 hover:bg-primary-700 rounded-lg text-white font-medium flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-file-image mr-2"></i> PNG
+                    </button>
+                    <button id="exportJPGBtn" class="py-3 bg-rose-600 hover:bg-rose-700 rounded-lg text-white font-medium flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-file-image mr-2"></i> JPG
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const settingsPanel = document.getElementById('settingsPanel');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            const themeBtn = document.getElementById('themeBtn');
+            const timeGrid = document.getElementById('timeGrid');
+            const eventModal = document.getElementById('eventModal');
+            const addEventBtn = document.getElementById('addEventBtn');
+            const cancelEventBtn = document.getElementById('cancelEventBtn');
+            const saveEventBtn = document.getElementById('saveEventBtn');
+            const exportModal = document.getElementById('exportModal');
+            const exportBtn = document.getElementById('exportBtn');
+            const fontSelectors = document.querySelectorAll('.font-selector');
+            const colorChoices = document.querySelectorAll('.color-choice');
+            const exportPNGBtn = document.getElementById('exportPNGBtn');
+            const exportJPGBtn = document.getElementById('exportJPGBtn');
+            const dateDisplay = document.getElementById('dateDisplay');
+            const weeklyBtn = document.getElementById('weeklyBtn');
+            const dailyBtn = document.getElementById('dailyBtn');
+            
+            // Event data structure
+            let events = [];
+            let currentView = 'weekly'; // 'weekly' or 'daily'
+            let selectedColor = '#3b82f6'; // Default blue color
+            let selectedFont = 'Inter'; // Default font
+            
+            // Check for saved theme preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+                themeBtn.innerHTML = '<i class="fa-solid fa-sun text-amber-400"></i>';
+            }
+            
+            // Initialize date display
+            updateDateDisplay();
+            
+            // Generate time grid
+            generateTimeGrid();
+            
+            // Populate with demo events
+            setTimeout(() => {
+                addDemoEvents();
+            }, 500);
+            
+            // Event Listeners
+            settingsBtn.addEventListener('click', toggleSettings);
+            closeSettingsBtn.addEventListener('click', toggleSettings);
+            themeBtn.addEventListener('click', toggleTheme);
+            addEventBtn.addEventListener('click', openEventModal);
+            cancelEventBtn.addEventListener('click', closeEventModal);
+            saveEventBtn.addEventListener('click', saveEvent);
+            exportBtn.addEventListener('click', openExportModal);
+            exportPNGBtn.addEventListener('click', () => exportSchedule('png'));
+            exportJPGBtn.addEventListener('click', () => exportSchedule('jpg'));
+            
+            weeklyBtn.addEventListener('click', () => switchView('weekly'));
+            dailyBtn.addEventListener('click', () => switchView('daily'));
+            
+            // Font selector event listeners
+            fontSelectors.forEach(selector => {
+                selector.addEventListener('click', function() {
+                    selectedFont = this.dataset.font;
+                    document.body.style.fontFamily = selectedFont + ', sans-serif';
+                    
+                    // Update UI
+                    document.querySelectorAll('.font-selector').forEach(el => {
+                        el.classList.remove('border-primary-500', 'bg-primary-50');
+                        el.classList.add('border-transparent');
+                    });
+                    this.classList.add('border-primary-500', 'bg-primary-50');
+                });
+            });
+            
+            // Color selector event listeners
+            colorChoices.forEach(choice => {
+                choice.addEventListener('click', function() {
+                    selectedColor = this.dataset.color;
+                    
+                    // Update UI
+                    document.querySelectorAll('.color-choice').forEach(el => {
+                        el.classList.remove('border-blue-600');
+                        el.classList.add('border-transparent');
+                    });
+                    this.classList.remove('border-transparent');
+                    this.classList.add('border-blue-600');
+                });
+            });
+            
+            // Functions
+            function toggleSettings() {
+                settingsPanel.classList.toggle('hidden');
+            }
+            
+            function toggleTheme() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('darkMode', isDark.toString());
+                
+                if (isDark) {
+                    themeBtn.innerHTML = '<i class="fa-solid fa-sun text-amber-400"></i>';
+                } else {
+                    themeBtn.innerHTML = '<i class="fa-solid fa-moon text-gray-600"></i>';
+                }
+            }
+            
+            function openEventModal() {
+                eventModal.classList.remove('hidden');
+            }
+            
+            function closeEventModal() {
+                eventModal.classList.add('hidden');
+            }
+            
+            function openExportModal() {
+                exportModal.classList.remove('hidden');
+            }
+            
+            function switchView(view) {
+                if (currentView === view) return;
+                
+                currentView = view;
+                
+                if (view === 'weekly') {
+                    weeklyBtn.classList.add('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+                    dailyBtn.classList.remove('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+                    dailyBtn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                } else {
+                    dailyBtn.classList.add('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+                    weeklyBtn.classList.remove('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+                    weeklyBtn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                }
+                
+                // Here we would update the grid to show the appropriate view
+                // For now, just regenerate the grid
+                timeGrid.innerHTML = '';
+                generateTimeGrid();
+                addDemoEvents();
+            }
+            
+            function updateDateDisplay() {
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Set to Monday
+                
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                
+                const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                dateDisplay.textContent = 
+                    `${startOfWeek.toLocaleDateString('id-ID', options)} - ${endOfWeek.toLocaleDateString('id-ID', options)}`;
+            }
+            
+            function generateTimeGrid() {
+                const hourHeight = 60; // height in px for 1 hour
+                
+                for (let hour = 6; hour <= 22; hour++) {
+                    const row = document.createElement('div');
+                    row.classList.add('grid', 'grid-cols-8', 'gap-px');
+                    
+                    // Time label cell
+                    const timeCell = document.createElement('div');
+                    timeCell.classList.add('bg-gray-100', 'dark:bg-gray-800', 'py-3', 'px-2', 'flex', 'items-center', 'text-sm', 'text-gray-500', 'dark:text-gray-400');
+                    timeCell.innerHTML = `<span>${hour}:00</span>`;
+                    
+                    row.appendChild(timeCell);
+                    
+                    // Create 7 empty cells for days
+                    for (let i = 0; i < 7; i++) {
+                        const dayCell = document.createElement('div');
+                        dayCell.classList.add('hour-row', 'relative', 'bg-white', 'dark:bg-gray-750');
+                        dayCell.dataset.day = i;
+                        dayCell.dataset.hour = hour;
+                        dayCell.dataset.time = `${hour}:00`;
+                        
+                        // Make cells droppable
+                        dayCell.addEventListener('dragover', handleDragOver);
+                        dayCell.addEventListener('drop', handleDrop);
+                        
+                        row.appendChild(dayCell);
+                    }
+                    
+                    timeGrid.appendChild(row);
+                }
+            }
+            
+            function addEventToGrid(event) {
+                const { day, startTime, endTime, title, color, id } = event;
+                
+                // Calculate position and height
+                const [startHour, startMinute] = startTime.split(':').map(Number);
+                const [endHour, endMinute] = endTime.split(':').map(Number);
+                
+                const startPosition = ((startHour - 6) * 60 + startMinute) * (60 / 60); // Each hour row is 60px
+                const duration = ((endHour - startHour) * 60 + (endMinute - startMinute)) * (60 / 60);
+                
+                // Find the corresponding time cell
+                const dayCell = document.querySelector(`.hour-row[data-day="${day}"][data-hour="${startHour}"]`);
+                
+                if (!dayCell) return;
+                
+                // Create event card
+                const eventElement = document.createElement('div');
+                eventElement.classList.add('event-card', 'absolute', 'left-2', 'right-2', 'rounded-lg', 'p-3', 'cursor-move');
+                eventElement.style.top = `${startPosition}px`;
+                eventElement.style.height = `${duration}px`;
+                eventElement.style.backgroundColor = `${color}1a`;
+                eventElement.style.borderLeftColor = color;
+                eventElement.innerHTML = `
+                    <div class="font-medium truncate">${title}</div>
+                    <div class="text-xs mt-1">${startTime} - ${endTime}</div>
+                `;
+                eventElement.dataset.eventId = id;
+                
+                // Make event draggable
+                eventElement.draggable = true;
+                eventElement.addEventListener('dragstart', handleDragStart);
+                
+                dayCell.appendChild(eventElement);
+            }
+            
+            function addDemoEvents() {
+                const demoEvents = [
+                    {
+                        id: 'event1',
+                        title: 'Meeting Proyek',
+                        day: 0,
+                        startTime: '09:00',
+                        endTime: '10:30',
+                        color: '#3b82f6',
+                        notes: 'Presentasi laporan kemajuan'
+                    },
+                    {
+                        id: 'event2',
+                        title: 'Olahraga',
+                        day: 1,
+                        startTime: '18:00',
+                        endTime: '19:30',
+                        color: '#10b981',
+                        notes: 'Gym di Sport Center'
+                    },
+                    {
+                        id: 'event3',
+                        title: 'Belajar Bahasa',
+                        day: 3,
+                        startTime: '15:00',
+                        endTime: '16:30',
+                        color: '#f59e0b',
+                        notes: 'Sesi belajar bahasa Inggris'
+                    },
+                    {
+                        id: 'event4',
+                        title: 'Makan Malam',
+                        day: 4,
+                        startTime: '19:00',
+                        endTime: '20:30',
+                        color: '#f43f5e',
+                        notes: 'Restoran baru di pusat kota'
+                    },
+                    {
+                        id: 'event5',
+                        title: 'Rapat Tim',
+                        day: 2,
+                        startTime: '11:00',
+                        endTime: '12:00',
+                        color: '#8b5cf6',
+                        notes: 'Rapat kolaborasi departemen'
+                    }
+                ];
+                
+                events = demoEvents;
+                
+                demoEvents.forEach(event => {
+                    addEventToGrid(event);
+                });
+            }
+            
+            function saveEvent() {
+                const title = document.getElementById('eventTitle').value;
+                const day = document.getElementById('eventDay').value;
+                const startTime = document.getElementById('eventStart').value;
+                const endTime = document.getElementById('eventEnd').value;
+                const notes = document.getElementById('eventNotes').value;
+                
+                if (!title) {
+                    alert('Silakan masukkan nama kegiatan');
+                    return;
+                }
+                
+                const event = {
+                    id: 'event' + Date.now(),
+                    title,
+                    day,
+                    startTime,
+                    endTime,
+                    color: selectedColor,
+                    notes
+                };
+                
+                events.push(event);
+                addEventToGrid(event);
+                closeEventModal();
+                
+                // Reset form
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventStart').value = '09:00';
+                document.getElementById('eventEnd').value = '10:00';
+                document.getElementById('eventNotes').value = '';
+            }
+            
+            // Drag and Drop functions
+            function handleDragStart(e) {
+                e.dataTransfer.setData('text/plain', e.target.dataset.eventId);
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.target.classList.add('grid-drag-over');
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                e.target.classList.remove('grid-drag-over');
+                
+                const eventId = e.dataTransfer.getData('text/plain');
+                const targetCell = e.target.closest('.hour-row');
+                
+                if (!targetCell || !eventId) return;
+                
+                // Find the event
+                const eventIndex = events.findIndex(ev => ev.id === eventId);
+                if (eventIndex === -1) return;
+                
+                // Update event
+                events[eventIndex].day = parseInt(targetCell.dataset.day);
+                
+                // Update UI
+                timeGrid.innerHTML = '';
+                generateTimeGrid();
+                events.forEach(ev => addEventToGrid(ev));
+            }
+            
+            function exportSchedule(format) {
+                html2canvas(document.getElementById('scheduleGrid')).then(canvas => {
+                    // Create a temporary link
+                    const link = document.createElement('a');
+                    link.download = `jadwal-${new Date().toISOString().slice(0,10)}.${format}`;
+                    link.href = canvas.toDataURL(`image/${format}`);
+                    link.click();
+                    
+                    // Close export modal
+                    exportModal.classList.add('hidden');
+                    
+                    // Show success notification
+                    showNotification('Jadwal berhasil diekspor!');
+                });
+            }
+            
+            function showNotification(message) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.classList.add('fixed', 'top-6', 'right-6', 'px-4', 'py-3', 'rounded-lg', 'bg-green-600', 'text-white', 'flex', 'items-center', 'shadow-lg', 'z-50', 'fade-in');
+                notification.innerHTML = `
+                    <i class="fa-solid fa-circle-check mr-2"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

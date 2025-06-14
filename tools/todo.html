@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List App with API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .todo-item:hover .todo-actions {
+            opacity: 1;
+        }
+
+        .checkbox:checked + .checkmark {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .checkbox:checked + .checkmark:after {
+            display: block;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .loading-btn {
+            position: relative;
+        }
+
+        .loading-btn .btn-text {
+            visibility: visible;
+        }
+
+        .loading-btn .spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            visibility: hidden;
+        }
+
+        .loading-btn.loading .btn-text {
+            visibility: hidden;
+        }
+
+        .loading-btn.loading .spinner {
+            visibility: visible;
+        }
+
+        .loading-action {
+            position: relative;
+        }
+
+        .loading-action .action-text {
+            visibility: visible;
+        }
+
+        .loading-action .action-spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            visibility: hidden;
+        }
+
+        .loading-action.loading .action-text {
+            visibility: hidden;
+        }
+
+        .loading-action.loading .action-spinner {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold">Todo List</h1>
+                    <div class="flex items-center space-x-2">
+                        <span id="todo-count" class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">0 tasks</span>
+                        <button id="refresh-btn" class="loading-btn bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition">
+                            <span class="btn-text"><i class="fas fa-sync-alt"></i></span>
+                            <span class="spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-blue-100 mt-1">Using JSONPlaceholder API</p>
+            </div>
+
+            <!-- Add Todo Form -->
+            <div class="p-6 border-b">
+                <form id="todo-form" class="flex gap-3">
+                    <input
+                        type="text"
+                        id="todo-input"
+                        placeholder="Add a new task..."
+                        class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                    >
+                    <button
+                        type="submit"
+                        id="add-btn"
+                        class="loading-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2"
+                    >
+                        <span class="btn-text flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Add
+                        </span>
+                        <span class="spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </form>
+                <div id="error-message" class="text-red-500 mt-2 text-sm hidden"></div>
+            </div>
+
+            <!-- Todo List -->
+            <div class="divide-y">
+                <div id="todo-list" class="divide-y">
+                    <!-- Todos will be added here dynamically -->
+                </div>
+
+                <div id="loading" class="p-6 text-center text-gray-500">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Loading todos...
+                </div>
+
+                <div id="empty-state" class="p-6 text-center text-gray-500 hidden">
+                    <i class="fas fa-clipboard-list text-4xl mb-2 text-gray-300"></i>
+                    <p>No tasks found. Add one above!</p>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="bg-gray-50 p-4 text-sm text-gray-500 flex justify-between">
+                <div>
+                    <span id="completed-count">0</span> of <span id="total-count">0</span> tasks completed
+                </div>
+                <div>
+                    <span id="api-status" class="inline-flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span>
+                        API Connected
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center text-sm text-gray-500">
+            <p>Powered by <a href="https://jsonplaceholder.typicode.com/" target="_blank" class="text-blue-500 hover:underline">JSONPlaceholder</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const API_URL = 'https://jsonplaceholder.typicode.com/todos';
+            let todos = [];
+            let currentId = 200; // Starting ID for new todos (to avoid conflicts with API)
+
+            // DOM Elements
+            const todoForm = document.getElementById('todo-form');
+            const todoInput = document.getElementById('todo-input');
+            const todoList = document.getElementById('todo-list');
+            const loadingElement = document.getElementById('loading');
+            const emptyState = document.getElementById('empty-state');
+            const errorMessage = document.getElementById('error-message');
+            const refreshBtn = document.getElementById('refresh-btn');
+            const addBtn = document.getElementById('add-btn');
+            const todoCount = document.getElementById('todo-count');
+            const completedCount = document.getElementById('completed-count');
+            const totalCount = document.getElementById('total-count');
+
+            // Initial fetch
+            fetchTodos();
+
+            // Event Listeners
+            todoForm.addEventListener('submit', handleAddTodo);
+            refreshBtn.addEventListener('click', fetchTodos);
+
+            // Fetch todos from API
+            async function fetchTodos() {
+                try {
+                    setLoading(refreshBtn, true);
+                    showLoading();
+                    const response = await fetch(`${API_URL}?_limit=10`);
+                    if (!response.ok) throw new Error('Failed to fetch todos');
+                    todos = await response.json();
+                    renderTodos();
+                    updateStats();
+                } catch (error) {
+                    showError('Failed to load todos. Please try again.');
+                    console.error('Error fetching todos:', error);
+                } finally {
+                    setLoading(refreshBtn, false);
+                    hideLoading();
+                }
+            }
+
+            // Add new todo
+            async function handleAddTodo(e) {
+                e.preventDefault();
+                const title = todoInput.value.trim();
+
+                if (!title) {
+                    showError('Please enter a task');
+                    todoInput.classList.add('shake', 'border-red-500');
+                    setTimeout(() => {
+                        todoInput.classList.remove('shake', 'border-red-500');
+                    }, 500);
+                    return;
+                }
+
+                try {
+                    setLoading(addBtn, true);
+                    showLoading();
+                    const newTodo = {
+                        userId: 1,
+                        id: currentId++,
+                        title: title,
+                        completed: false
+                    };
+
+                    // Simulate API POST (JSONPlaceholder doesn't actually save)
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(newTodo),
+                        headers: {
+                            'Content-type': 'application/json; charset=UTF-8',
+                        },
+                    });
+
+                    if (!response.ok) throw new Error('Failed to add todo');
+
+                    // Add to local state (since API doesn't actually save)
+                    todos.unshift(newTodo);
+                    renderTodos();
+                    updateStats();
+
+                    // Reset form
+                    todoInput.value = '';
+                    hideError();
+                } catch (error) {
+                    showError('Failed to add todo. Please try again.');
+                    console.error('Error adding todo:', error);
+                } finally {
+                    setLoading(addBtn, false);
+                    hideLoading();
+                }
+            }
+
+            // Toggle todo completion
+            async function toggleTodoCompletion(todoId) {
+                try {
+                    const todoItem = document.querySelector(`.todo-item[data-id="${todoId}"]`);
+                    const checkmark = todoItem.querySelector('.checkmark');
+                    const originalText = checkmark.textContent;
+
+                    // Show loading on the checkbox
+                    checkmark.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                    const todo = todos.find(t => t.id === todoId);
+                    if (!todo) return;
+
+                    const updatedTodo = { ...todo, completed: !todo.completed };
+
+                    // Simulate API PUT (JSONPlaceholder doesn't actually save)
+                    const response = await fetch(`${API_URL}/${todoId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(updatedTodo),
+                        headers: {
+                            'Content-type': 'application/json; charset=UTF-8',
+                        },
+                    });
+
+                    if (!response.ok) throw new Error('Failed to update todo');
+
+                    // Update local state
+                    const index = todos.findIndex(t => t.id === todoId);
+                    if (index !== -1) {
+                        todos[index] = updatedTodo;
+                        renderTodos();
+                        updateStats();
+                    }
+                } catch (error) {
+                    showError('Failed to update todo. Please try again.');
+                    console.error('Error updating todo:', error);
+                    // Re-render to restore the original state
+                    renderTodos();
+                }
+            }
+
+            // Delete todo
+            async function deleteTodo(todoId) {
+                try {
+                    const todoItem = document.querySelector(`.todo-item[data-id="${todoId}"]`);
+                    const deleteBtn = todoItem.querySelector('.delete-btn');
+
+                    // Show loading on the delete button
+                    deleteBtn.classList.add('loading');
+                    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                    // Simulate API DELETE (JSONPlaceholder doesn't actually delete)
+                    const response = await fetch(`${API_URL}/${todoId}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (!response.ok) throw new Error('Failed to delete todo');
+
+                    // Update local state
+                    todos = todos.filter(todo => todo.id !== todoId);
+                    renderTodos();
+                    updateStats();
+                } catch (error) {
+                    showError('Failed to delete todo. Please try again.');
+                    console.error('Error deleting todo:', error);
+                    // Re-render to restore the original state
+                    renderTodos();
+                }
+            }
+
+            // Render todos to the DOM
+            function renderTodos() {
+                if (todos.length === 0) {
+                    todoList.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                todoList.innerHTML = todos.map(todo => `
+                    <div class="todo-item group p-4 hover:bg-gray-50 transition flex items-center" data-id="${todo.id}">
+                        <label class="flex items-center cursor-pointer flex-1">
+                            <input
+                                type="checkbox"
+                                class="checkbox hidden"
+                                ${todo.completed ? 'checked' : ''}
+                                onchange="document.querySelector('.todo-item[data-id=\\'${todo.id}\\'] .checkmark').dispatchEvent(new Event('click'))"
+                            >
+                            <span class="checkmark w-5 h-5 border-2 border-gray-300 rounded mr-3 relative transition ${todo.completed ? 'line-through text-gray-400' : ''}">
+                                ${todo.completed ? '' : ''}
+                            </span>
+                            <span class="${todo.completed ? 'line-through text-gray-400' : ''}">${todo.title}</span>
+                        </label>
+                        <div class="todo-actions opacity-0 group-hover:opacity-100 transition flex gap-2">
+                            <button class="loading-action text-gray-400 hover:text-blue-500 transition">
+                                <span class="action-text"><i class="fas fa-pencil-alt"></i></span>
+                                <span class="action-spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                            </button>
+                            <button class="loading-action delete-btn text-gray-400 hover:text-red-500 transition" onclick="document.querySelector('.todo-item[data-id=\\'${todo.id}\\'] .delete-btn').click()">
+                                <span class="action-text"><i class="fas fa-trash-alt"></i></span>
+                                <span class="action-spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners to the checkmarks and buttons
+                document.querySelectorAll('.checkmark').forEach(checkmark => {
+                    checkmark.addEventListener('click', function() {
+                        const todoId = parseInt(this.closest('.todo-item').dataset.id);
+                        toggleTodoCompletion(todoId);
+                    });
+                });
+
+                document.querySelectorAll('.loading-action:first-child').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const todoId = parseInt(this.closest('.todo-item').dataset.id);
+                        editTodo(todoId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const todoId = parseInt(this.closest('.todo-item').dataset.id);
+                        deleteTodo(todoId);
+                    });
+                });
+            }
+
+            // Edit todo (inline editing)
+            function editTodo(todoId) {
+                const todoItem = document.querySelector(`.todo-item[data-id="${todoId}"]`);
+                const editBtn = todoItem.querySelector('.loading-action:first-child');
+                const todo = todos.find(t => t.id === todoId);
+                if (!todo) return;
+
+                // Show loading on edit button
+                setLoading(editBtn, true);
+
+                setTimeout(() => {
+                    const currentText = todo.title;
+                    todoItem.innerHTML = `
+                        <form class="edit-form flex-1 flex gap-2">
+                            <input
+                                type="text"
+                                value="${currentText}"
+                                class="flex-1 px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                            <button type="submit" class="loading-btn bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                                <span class="btn-text">Save</span>
+                                <span class="spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                            </button>
+                            <button type="button" class="cancel-edit bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm">Cancel</button>
+                        </form>
+                    `;
+
+                    const form = todoItem.querySelector('.edit-form');
+                    const saveBtn = todoItem.querySelector('.loading-btn');
+                    const cancelBtn = todoItem.querySelector('.cancel-edit');
+
+                    form.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const newTitle = this.querySelector('input').value.trim();
+
+                        if (!newTitle) {
+                            showError('Task cannot be empty');
+                            return;
+                        }
+
+                        try {
+                            setLoading(saveBtn, true);
+                            const updatedTodo = { ...todo, title: newTitle };
+
+                            // Simulate API PUT
+                            const response = await fetch(`${API_URL}/${todoId}`, {
+                                method: 'PUT',
+                                body: JSON.stringify(updatedTodo),
+                                headers: {
+                                    'Content-type': 'application/json; charset=UTF-8',
+                                },
+                            });
+
+                            if (!response.ok) throw new Error('Failed to update todo');
+
+                            // Update local state
+                            const index = todos.findIndex(t => t.id === todoId);
+                            if (index !== -1) {
+                                todos[index] = updatedTodo;
+                                renderTodos();
+                            }
+                        } catch (error) {
+                            showError('Failed to update todo. Please try again.');
+                            console.error('Error updating todo:', error);
+                        } finally {
+                            setLoading(saveBtn, false);
+                        }
+                    });
+
+                    cancelBtn.addEventListener('click', function() {
+                        renderTodos();
+                    });
+                }, 300); // Small delay to show loading state
+            }
+
+            // Update stats
+            function updateStats() {
+                const total = todos.length;
+                const completed = todos.filter(todo => todo.completed).length;
+
+                todoCount.textContent = `${total} ${total === 1 ? 'task' : 'tasks'}`;
+                completedCount.textContent = completed;
+                totalCount.textContent = total;
+            }
+
+            // Helper functions
+            function showLoading() {
+                loadingElement.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+            }
+
+            function hideLoading() {
+                loadingElement.classList.add('hidden');
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+
+            function hideError() {
+                errorMessage.classList.add('hidden');
+            }
+
+            function setLoading(element, isLoading) {
+                if (isLoading) {
+                    element.classList.add('loading');
+                } else {
+                    element.classList.remove('loading');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherFlow | Fake Weather App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .container-bg {
+            transition: background 0.8s ease-in-out;
+        }
+        
+        .sunny-bg {
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+        }
+        
+        .cloudy-bg {
+            background: linear-gradient(135deg, #bdc3c7, #2c3e50);
+        }
+        
+        .rainy-bg {
+            background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .cloud {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 0;
+        }
+        
+        .cloud-1 {
+            top: 10%;
+            left: -50px;
+            animation: floatCloud 35s linear infinite;
+        }
+        
+        .cloud-2 {
+            top: 30%;
+            right: -50px;
+            animation: floatCloud 40s linear infinite reverse;
+        }
+        
+        .cloud-3 {
+            top: 55%;
+            left: -60px;
+            animation: floatCloud 45s linear infinite;
+        }
+        
+        @keyframes floatCloud {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 100px)); }
+        }
+        
+        .lift-up {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lift-up:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="container-bg sunny-bg">
+    <!-- Background Clouds -->
+    <div class="cloud cloud-1 text-6xl opacity-70">☁️</div>
+    <div class="cloud cloud-2 text-7xl opacity-60">☁️</div>
+    <div class="cloud cloud-3 text-5xl opacity-50">☁️</div>
+    
+    <div class="min-h-screen flex flex-col items-center justify-center relative z-10">
+        <!-- App Container -->
+        <div class="w-full max-w-md mx-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-white tracking-tight">WeatherFlow</h1>
+                <p class="text-white text-opacity-80 mt-1">Your fake weather forecast</p>
+            </div>
+            
+            <!-- Search Form -->
+            <form id="weatherForm" class="mb-8">
+                <div class="flex">
+                    <input 
+                        type="text" 
+                        id="cityInput" 
+                        placeholder="Enter city name..." 
+                        class="flex-grow px-5 py-3 rounded-l-2xl border-0 bg-white bg-opacity-70 focus:bg-opacity-90 focus:ring-0 text-gray-700 placeholder-gray-500"
+                        autocomplete="off"
+                        required
+                    >
+                    <button 
+                        type="submit"
+                        class="lift-up bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-r-2xl font-medium transition-all duration-300"
+                    >
+                        <i class="wi wi-thermometer mr-2"></i>Check
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Weather Display -->
+            <div id="weatherResult" class="hidden opacity-0 transition-opacity duration-500">
+                <div class="text-center">
+                    <h2 id="cityName" class="text-2xl font-semibold text-white mb-1"></h2>
+                    <div id="weatherIcon" class="text-8xl my-6"></div>
+                    <div id="temperature" class="text-6xl font-bold text-white mb-4"></div>
+                    <div id="weatherCondition" class="text-xl font-medium text-white opacity-90 uppercase tracking-wider mb-6"></div>
+                    
+                    <div class="grid grid-cols-3 gap-4 mt-8 text-white">
+                        <div class="bg-white bg-opacity-20 rounded-2xl py-3 px-4">
+                            <i class="wi wi-humidity text-3xl"></i>
+                            <div id="humidity" class="mt-2 font-semibold">--%</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-2xl py-3 px-4">
+                            <i class="wi wi-strong-wind text-3xl"></i>
+                            <div id="wind" class="mt-2 font-semibold">-- km/h</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-2xl py-3 px-4">
+                            <i class="wi wi-barometer text-3xl"></i>
+                            <div id="pressure" class="mt-2 font-semibold">-- hPa</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recently Checked -->
+            <div class="mt-10 pt-6 border-t border-white border-opacity-20">
+                <h3 class="text-white text-lg font-medium mb-3">Recently Checked</h3>
+                <div id="recentSearches" class="flex flex-wrap gap-2">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Attribution Footer -->
+        <p class="text-white text-opacity-60 mt-8 text-sm">&copy; Fake Weather App - For Design Purposes Only</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const weatherForm = document.getElementById('weatherForm');
+            const cityInput = document.getElementById('cityInput');
+            const weatherResult = document.getElementById('weatherResult');
+            const cityName = document.getElementById('cityName');
+            const weatherIcon = document.getElementById('weatherIcon');
+            const temperature = document.getElementById('temperature');
+            const weatherCondition = document.getElementById('weatherCondition');
+            const humidity = document.getElementById('humidity');
+            const wind = document.getElementById('wind');
+            const pressure = document.getElementById('pressure');
+            const recentSearches = document.getElementById('recentSearches');
+            const containerBg = document.querySelector('.container-bg');
+            
+            // Recently searched cities
+            let recentCities = JSON.parse(localStorage.getItem('recentCities')) || [];
+            
+            // Render recent cities
+            function renderRecentCities() {
+                recentSearches.innerHTML = '';
+                
+                recentCities.slice().reverse().forEach(city => {
+                    const button = document.createElement('button');
+                    button.textContent = city;
+                    button.classList.add('text-white', 'px-4', 'py-2', 'rounded-full', 'bg-white', 'bg-opacity-20', 'hover:bg-opacity-30', 'transition', 'lift-up');
+                    button.addEventListener('click', () => {
+                        cityInput.value = city;
+                        weatherForm.dispatchEvent(new Event('submit'));
+                    });
+                    recentSearches.appendChild(button);
+                });
+            }
+            
+            // Initialize recent cities
+            if (recentCities.length > 0) {
+                renderRecentCities();
+            }
+            
+            // Weather data generator
+            function generateWeather(city) {
+                // Save city to recent searches
+                if (!recentCities.includes(city)) {
+                    recentCities.push(city);
+                    if (recentCities.length > 5) recentCities.shift();
+                    localStorage.setItem('recentCities', JSON.stringify(recentCities));
+                    renderRecentCities();
+                }
+                
+                // Weather condition possibilities
+                const conditions = ['sunny', 'cloudy', 'rainy'];
+                const condition = conditions[Math.floor(Math.random() * conditions.length)];
+                
+                // Weather data
+                return {
+                    city: city,
+                    condition: condition,
+                    temp: Math.floor(Math.random() * 35) - 5, // From -5°C to 30°C
+                    humidity: Math.floor(Math.random() * 60) + 30, // 30-90%
+                    wind: (Math.random() * 40).toFixed(1), // 0-40 km/h
+                    pressure: Math.floor(Math.random() * 50) + 980 // 980-1030 hPa
+                };
+            }
+            
+            // Weather icons mapping
+            function getWeatherIcon(condition) {
+                const icons = {
+                    sunny: 'wi-day-sunny',
+                    cloudy: 'wi-day-cloudy',
+                    rainy: 'wi-rain'
+                };
+                return `<i class="wi ${icons[condition]}"></i>`;
+            }
+            
+            // Update background based on condition
+            function updateBackground(condition) {
+                containerBg.classList.remove('sunny-bg', 'cloudy-bg', 'rainy-bg');
+                
+                switch(condition) {
+                    case 'sunny':
+                        containerBg.classList.add('sunny-bg');
+                        break;
+                    case 'cloudy':
+                        containerBg.classList.add('cloudy-bg');
+                        break;
+                    case 'rainy':
+                        containerBg.classList.add('rainy-bg');
+                        break;
+                }
+            }
+            
+            // Show weather result with animation
+            function showWeather(data) {
+                // Update the DOM
+                cityName.textContent = data.city;
+                weatherIcon.innerHTML = getWeatherIcon(data.condition);
+                temperature.textContent = `${data.temp}°C`;
+                weatherCondition.textContent = data.condition;
+                humidity.textContent = `${data.humidity}%`;
+                wind.textContent = `${data.wind} km/h`;
+                pressure.textContent = `${data.pressure} hPa`;
+                
+                // Update background
+                updateBackground(data.condition);
+                
+                // Show with animation
+                weatherResult.classList.remove('hidden');
+                weatherResult.style.opacity = '0';
+                weatherResult.classList.add('fade-in');
+                
+                setTimeout(() => {
+                    weatherResult.style.opacity = '1';
+                }, 10);
+            }
+            
+            // Form submission handler
+            weatherForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const city = cityInput.value.trim();
+                if (city === '') return;
+                
+                // Generate fake weather data
+                const weatherData = generateWeather(city);
+                
+                // Display data
+                showWeather(weatherData);
+                
+                // Clear input
+                cityInput.value = '';
+            });
+            
+            // Add floating effect to all lift-up elements
+            const liftUpElements = document.querySelectorAll('.lift-up');
+            liftUpElements.forEach(el => {
+                el.addEventListener('mousedown', () => {
+                    el.style.transform = 'translateY(1px)';
+                });
+                
+                el.addEventListener('mouseup', () => {
+                    el.style.transform = 'translateY(0)';
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    el.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Example weather
+            setTimeout(() => {
+                const exampleCities = ['Paris', 'Tokyo', 'New York'];
+                const randomCity = exampleCities[Math.floor(Math.random() * exampleCities.length)];
+                cityInput.value = randomCity;
+                weatherForm.dispatchEvent(new Event('submit'));
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

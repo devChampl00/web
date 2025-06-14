@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Glass Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .btn-glow:hover {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+        
+        .display-text {
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-800 to-indigo-900 flex items-center justify-center p-4">
+    <div class="glass-effect rounded-3xl overflow-hidden w-full max-w-md animate-fade-in">
+        <!-- Display -->
+        <div class="p-6">
+            <div class="glass-effect rounded-2xl p-4 h-32 flex flex-col justify-between">
+                <div class="text-right text-gray-300 text-lg h-6 overflow-x-auto whitespace-nowrap">
+                    <span id="history"></span>
+                </div>
+                <div class="text-right text-white text-4xl font-light display-text overflow-x-auto whitespace-nowrap">
+                    <span id="display">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="grid grid-cols-4 gap-3 p-6">
+            <!-- Row 1 -->
+            <button onclick="clearAll()" class="glass-effect text-red-400 hover:text-red-300 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                <i class="fas fa-eraser"></i>
+            </button>
+            <button onclick="backspace()" class="glass-effect text-blue-300 hover:text-blue-200 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                <i class="fas fa-backspace"></i>
+            </button>
+            <button onclick="appendToDisplay('%')" class="glass-effect text-purple-300 hover:text-purple-200 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                %
+            </button>
+            <button onclick="appendToDisplay('/')" class="glass-effect bg-blue-500 bg-opacity-30 text-white h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                ÷
+            </button>
+            
+            <!-- Row 2 -->
+            <button onclick="appendToDisplay('7')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                7
+            </button>
+            <button onclick="appendToDisplay('8')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                8
+            </button>
+            <button onclick="appendToDisplay('9')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                9
+            </button>
+            <button onclick="appendToDisplay('*')" class="glass-effect bg-blue-500 bg-opacity-30 text-white h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                ×
+            </button>
+            
+            <!-- Row 3 -->
+            <button onclick="appendToDisplay('4')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                4
+            </button>
+            <button onclick="appendToDisplay('5')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                5
+            </button>
+            <button onclick="appendToDisplay('6')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                6
+            </button>
+            <button onclick="appendToDisplay('-')" class="glass-effect bg-blue-500 bg-opacity-30 text-white h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                -
+            </button>
+            
+            <!-- Row 4 -->
+            <button onclick="appendToDisplay('1')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                1
+            </button>
+            <button onclick="appendToDisplay('2')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                2
+            </button>
+            <button onclick="appendToDisplay('3')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                3
+            </button>
+            <button onclick="appendToDisplay('+')" class="glass-effect bg-blue-500 bg-opacity-30 text-white h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                +
+            </button>
+            
+            <!-- Row 5 -->
+            <button onclick="toggleSign()" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                +/-
+            </button>
+            <button onclick="appendToDisplay('0')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                0
+            </button>
+            <button onclick="appendToDisplay('.')" class="glass-effect text-white hover:bg-white hover:bg-opacity-10 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                .
+            </button>
+            <button onclick="calculate()" class="glass-effect bg-indigo-500 text-white hover:bg-indigo-600 h-16 rounded-xl flex items-center justify-center text-xl font-medium btn-glow btn-press transition-all">
+                =
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let resetInput = false;
+        
+        const display = document.getElementById('display');
+        const history = document.getElementById('history');
+        
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+        
+        function appendToDisplay(value) {
+            if (currentInput === '0' || resetInput) {
+                currentInput = '';
+                resetInput = false;
+            }
+            
+            if (value === '.' && currentInput.includes('.')) return;
+            
+            currentInput += value;
+            updateDisplay();
+        }
+        
+        function setOperation(op) {
+            if (operation !== null) calculate();
+            previousInput = currentInput;
+            operation = op;
+            resetInput = true;
+            history.textContent = `${previousInput} ${operation}`;
+        }
+        
+        function calculate() {
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            
+            if (isNaN(prev) || isNaN(current)) return;
+            
+            switch (operation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = prev / current;
+                    break;
+                case '%':
+                    result = prev % current;
+                    break;
+                default:
+                    return;
+            }
+            
+            currentInput = result.toString();
+            operation = null;
+            resetInput = true;
+            history.textContent = '';
+            updateDisplay();
+        }
+        
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            history.textContent = '';
+            updateDisplay();
+        }
+        
+        function backspace() {
+            if (currentInput.length === 1) {
+                currentInput = '0';
+            } else {
+                currentInput = currentInput.slice(0, -1);
+            }
+            updateDisplay();
+        }
+        
+        function toggleSign() {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            updateDisplay();
+        }
+        
+        // Event listeners for keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') appendToDisplay(e.key);
+            else if (e.key === '.') appendToDisplay('.');
+            else if (e.key === '+') setOperation('+');
+            else if (e.key === '-') setOperation('-');
+            else if (e.key === '*') setOperation('*');
+            else if (e.key === '/') setOperation('/');
+            else if (e.key === '%') setOperation('%');
+            else if (e.key === 'Enter' || e.key === '=') calculate();
+            else if (e.key === 'Escape') clearAll();
+            else if (e.key === 'Backspace') backspace();
+        });
+        
+        // Update button click handlers to use setOperation for operators
+        document.querySelectorAll('button').forEach(button => {
+            const op = button.textContent.trim();
+            if (['+', '-', '×', '÷', '%'].includes(op)) {
+                button.onclick = () => {
+                    const operation = op === '×' ? '*' : op === '÷' ? '/' : op;
+                    setOperation(operation);
+                };
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL to ERD Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .btn-glow:hover {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+        
+        #erd-diagram {
+            min-height: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            overflow: auto;
+        }
+        
+        .mermaid {
+            background-color: transparent !important;
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background-color: rgba(59, 130, 246, 0.5);
+            color: white;
+        }
+        
+        #sql-input {
+            min-height: 200px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-800 to-indigo-900 p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-8 animate-fade-in">
+            <h1 class="text-4xl font-bold text-white mb-2">SQL to ERD Converter</h1>
+            <p class="text-lg text-blue-200">Transform your SQL schema into a visual Entity Relationship Diagram</p>
+        </header>
+        
+        <div class="glass-effect rounded-2xl overflow-hidden mb-6 animate-fade-in">
+            <div class="flex border-b border-gray-700">
+                <button class="tab-button active px-6 py-3 text-white font-medium" data-tab="input">SQL Input</button>
+                <button class="tab-button px-6 py-3 text-gray-300 font-medium" data-tab="examples">Examples</button>
+                <button class="tab-button px-6 py-3 text-gray-300 font-medium" data-tab="guide">Guide</button>
+            </div>
+            
+            <div class="p-6">
+                <!-- Input Tab -->
+                <div class="tab-content" id="input-tab">
+                    <div class="mb-4">
+                        <label for="sql-input" class="block text-white mb-2">Enter your SQL schema:</label>
+                        <textarea id="sql-input" class="w-full bg-gray-900 bg-opacity-50 text-white p-4 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Paste your SQL CREATE TABLE statements here..."></textarea>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <button id="convert-btn" class="glass-effect bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center btn-glow btn-press transition-all">
+                            <i class="fas fa-project-diagram mr-2"></i> Convert to ERD
+                        </button>
+                        <button id="clear-btn" class="glass-effect bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg flex items-center btn-glow btn-press transition-all">
+                            <i class="fas fa-trash-alt mr-2"></i> Clear
+                        </button>
+                        <button id="copy-btn" class="glass-effect bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg flex items-center btn-glow btn-press transition-all">
+                            <i class="fas fa-copy mr-2"></i> Copy Mermaid Code
+                        </button>
+                        <button id="download-btn" class="glass-effect bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center btn-glow btn-press transition-all">
+                            <i class="fas fa-download mr-2"></i> Download as SVG
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Examples Tab -->
+                <div class="tab-content hidden" id="examples-tab">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg">
+                            <h3 class="text-white font-medium mb-2">Simple Database</h3>
+                            <pre class="text-gray-300 text-sm overflow-auto max-h-40"><code>CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    user_id INT,
+    order_date DATE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE products (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+
+CREATE TABLE order_items (
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);</code></pre>
+                            <button class="load-example mt-2 glass-effect bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-sm">
+                                Load Example
+                            </button>
+                        </div>
+                        
+                        <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg">
+                            <h3 class="text-white font-medium mb-2">E-commerce</h3>
+                            <pre class="text-gray-300 text-sm overflow-auto max-h-40"><code>CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(20)
+);
+
+CREATE TABLE addresses (
+    address_id INT PRIMARY KEY,
+    customer_id INT,
+    street VARCHAR(100),
+    city VARCHAR(50),
+    state VARCHAR(50),
+    zip_code VARCHAR(20),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    description TEXT,
+    price DECIMAL(10,2),
+    stock_quantity INT
+);
+
+CREATE TABLE categories (
+    category_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    description TEXT
+);
+
+CREATE TABLE product_categories (
+    product_id INT,
+    category_id INT,
+    PRIMARY KEY (product_id, category_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);</code></pre>
+                            <button class="load-example mt-2 glass-effect bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-sm">
+                                Load Example
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Guide Tab -->
+                <div class="tab-content hidden" id="guide-tab">
+                    <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg text-white">
+                        <h2 class="text-xl font-bold mb-4">How to use this tool</h2>
+                        
+                        <div class="mb-4">
+                            <h3 class="font-medium text-blue-300 mb-2">Supported SQL Syntax</h3>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>CREATE TABLE statements</li>
+                                <li>Column definitions with data types</li>
+                                <li>PRIMARY KEY constraints</li>
+                                <li>FOREIGN KEY constraints</li>
+                                <li>UNIQUE constraints</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="font-medium text-blue-300 mb-2">Limitations</h3>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Only standard SQL syntax is supported</li>
+                                <li>Database-specific features may not work</li>
+                                <li>Complex constraints might not be visualized</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium text-blue-300 mb-2">Tips</h3>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Use clear table and column names</li>
+                                <li>Define all foreign key relationships</li>
+                                <li>Keep your SQL well-formatted for best results</li>
+                                <li>Try the examples to see how it works</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass-effect rounded-2xl p-6 animate-fade-in">
+            <h2 class="text-xl font-bold text-white mb-4">ER Diagram</h2>
+            <div id="erd-diagram" class="flex items-center justify-center">
+                <div class="text-center text-gray-400">
+                    <i class="fas fa-project-diagram text-5xl mb-2"></i>
+                    <p>Your ER diagram will appear here</p>
+                    <p class="text-sm mt-2">Enter SQL above and click "Convert to ERD"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            er: {
+                diagramPadding: 20,
+                layoutDirection: 'TB', // Top to Bottom
+                useMaxWidth: true
+            }
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.add('text-gray-300');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                button.classList.remove('text-gray-300');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Show the selected tab content
+                const tabId = button.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+        
+        // Load example SQL
+        document.querySelectorAll('.load-example').forEach(button => {
+            button.addEventListener('click', () => {
+                const exampleSQL = button.parentElement.querySelector('code').textContent;
+                document.getElementById('sql-input').value = exampleSQL;
+                
+                // Switch to input tab
+                document.querySelector('.tab-button[data-tab="input"]').click();
+            });
+        });
+        
+        // Convert SQL to ERD
+        document.getElementById('convert-btn').addEventListener('click', () => {
+            const sqlInput = document.getElementById('sql-input').value.trim();
+            
+            if (!sqlInput) {
+                alert('Please enter some SQL to convert');
+                return;
+            }
+            
+            try {
+                const mermaidCode = convertSQLToMermaid(sqlInput);
+                renderERD(mermaidCode);
+            } catch (error) {
+                console.error('Error converting SQL to ERD:', error);
+                alert('Error converting SQL to ERD. Please check your SQL syntax.');
+            }
+        });
+        
+        // Clear button
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            document.getElementById('sql-input').value = '';
+            document.getElementById('erd-diagram').innerHTML = `
+                <div class="text-center text-gray-400">
+                    <i class="fas fa-project-diagram text-5xl mb-2"></i>
+                    <p>Your ER diagram will appear here</p>
+                    <p class="text-sm mt-2">Enter SQL above and click "Convert to ERD"</p>
+                </div>
+            `;
+        });
+        
+        // Copy Mermaid code
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const mermaidCode = document.getElementById('erd-diagram').getAttribute('data-mermaid');
+            if (!mermaidCode) {
+                alert('No diagram to copy. Please generate an ERD first.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(mermaidCode)
+                .then(() => {
+                    const originalText = document.getElementById('copy-btn').innerHTML;
+                    document.getElementById('copy-btn').innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                    setTimeout(() => {
+                        document.getElementById('copy-btn').innerHTML = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy to clipboard');
+                });
+        });
+        
+        // Download as SVG
+        document.getElementById('download-btn').addEventListener('click', () => {
+            const svgElement = document.getElementById('erd-diagram').querySelector('svg');
+            if (!svgElement) {
+                alert('No diagram to download. Please generate an ERD first.');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            const downloadLink = document.createElement('a');
+            downloadLink.href = svgUrl;
+            downloadLink.download = 'erd-diagram.svg';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        });
+        
+        // Function to convert SQL to Mermaid ERD syntax
+        function convertSQLToMermaid(sql) {
+            const tables = [];
+            const relationships = [];
+            
+            // Parse SQL to extract table information
+            const tableRegex = /CREATE\s+TABLE\s+(\w+)\s*\(([\s\S]+?)\)\s*;/g;
+            let tableMatch;
+            
+            while ((tableMatch = tableRegex.exec(sql)) !== null) {
+                const tableName = tableMatch[1];
+                const tableContent = tableMatch[2];
+                const columns = [];
+                let primaryKey = null;
+                
+                // Parse columns and constraints
+                const columnLines = tableContent.split('\n').map(line => line.trim()).filter(line => line);
+                
+                for (const line of columnLines) {
+                    // Skip constraint lines that start with CONSTRAINT
+                    if (line.startsWith('CONSTRAINT')) continue;
+                    
+                    // Check for primary key
+                    if (line.includes('PRIMARY KEY')) {
+                        const pkMatch = line.match(/PRIMARY KEY\s*\(([^)]+)\)/);
+                        if (pkMatch) {
+                            primaryKey = pkMatch[1].trim();
+                        }
+                        continue;
+                    }
+                    
+                    // Check for foreign key
+                    if (line.includes('FOREIGN KEY')) {
+                        const fkMatch = line.match(/FOREIGN KEY\s*\(([^)]+)\)\s+REFERENCES\s+(\w+)\s*\(([^)]+)\)/);
+                        if (fkMatch) {
+                            const fromColumn = fkMatch[1].trim();
+                            const toTable = fkMatch[2].trim();
+                            const toColumn = fkMatch[3].trim();
+                            relationships.push({
+                                fromTable: tableName,
+                                fromColumn: fromColumn,
+                                toTable: toTable,
+                                toColumn: toColumn
+                            });
+                        }
+                        continue;
+                    }
+                    
+                    // Regular column definition
+                    const columnMatch = line.match(/^(\w+)\s+([^\s,]+)/);
+                    if (columnMatch) {
+                        const columnName = columnMatch[1];
+                        const columnType = columnMatch[2];
+                        
+                        // Check for UNIQUE constraint
+                        const isUnique = line.includes('UNIQUE');
+                        
+                        columns.push({
+                            name: columnName,
+                            type: columnType,
+                            isPrimary: primaryKey === columnName,
+                            isUnique: isUnique
+                        });
+                    }
+                }
+                
+                tables.push({
+                    name: tableName,
+                    columns: columns,
+                    primaryKey: primaryKey
+                });
+            }
+            
+            // Generate Mermaid ERD syntax
+            let mermaidCode = 'erDiagram\n';
+            
+            // Add tables
+            for (const table of tables) {
+                mermaidCode += `    ${table.name} {\n`;
+                
+                // Add columns
+                for (const column of table.columns) {
+                    let columnLine = `        ${column.type} ${column.name}`;
+                    
+                    if (column.isPrimary) {
+                        columnLine += ' PK';
+                    } else if (column.isUnique) {
+                        columnLine += ' UK';
+                    }
+                    
+                    mermaidCode += columnLine + '\n';
+                }
+                
+                mermaidCode += '    }\n';
+            }
+            
+            // Add relationships
+            for (const rel of relationships) {
+                mermaidCode += `    ${rel.fromTable} ||--o{ ${rel.toTable} : "${rel.fromColumn} references ${rel.toColumn}"\n`;
+            }
+            
+            return mermaidCode;
+        }
+        
+        // Function to render Mermaid ERD
+        function renderERD(mermaidCode) {
+            const erdContainer = document.getElementById('erd-diagram');
+            erdContainer.setAttribute('data-mermaid', mermaidCode);
+            
+            // Clear previous diagram
+            erdContainer.innerHTML = '';
+            
+            // Add loading indicator
+            erdContainer.innerHTML = '<div class="text-center text-gray-400"><i class="fas fa-spinner fa-spin text-3xl mb-2"></i><p>Generating diagram...</p></div>';
+            
+            // Try to render with Mermaid
+            try {
+                mermaid.mermaidAPI.render('erd-diagram-svg', mermaidCode, (svgCode) => {
+                    erdContainer.innerHTML = svgCode;
+                    
+                    // Make the SVG responsive
+                    const svg = erdContainer.querySelector('svg');
+                    if (svg) {
+                        svg.style.maxWidth = '100%';
+                        svg.style.height = 'auto';
+                    }
+                });
+            } catch (error) {
+                console.error('Mermaid rendering error:', error);
+                erdContainer.innerHTML = `
+                    <div class="text-center text-red-400">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                        <p>Error rendering diagram</p>
+                        <p class="text-sm mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
